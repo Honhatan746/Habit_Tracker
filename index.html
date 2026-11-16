@@ -1,0 +1,4472 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#F8FAF8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#121A15" media="(prefers-color-scheme: dark)">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Habit Tracker – Small steps. Lasting change.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <style>
+    /* =========================================
+       CSS VARIABLES & THEME DEFINITIONS
+       ========================================= */
+    :root {
+      --primary-green: #34765A;
+      --primary-dark: #245741;
+      --primary-light: #A8D5BA;
+      --primary-soft: #EAF5EE;
+      --accent: #34765A;
+      --accent-soft: #EAF5EE;
+      --accent-border: #D1E7DA;
+      
+      --bg-app: #F8FAF8;
+      --card-bg: #FFFFFF;
+      --card-hover: #FDFEFE;
+      --text-main: #26352D;
+      --text-sub: #7B8980;
+      --border-color: #E5ECE7;
+      
+      --warning: #EBB036;
+      --warning-soft: #FFF7E6;
+      --danger: #E25C5C;
+      --danger-soft: #FDE8E8;
+      --success: #2DA44E;
+      --info: #3B82F6;
+      
+      --phone-width: 390px;
+      --phone-height: 844px;
+      --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg-app: #121A15;
+      --card-bg: #1B2620;
+      --card-hover: #212E27;
+      --text-main: #EDF3EF;
+      --text-sub: #8E9F94;
+      --border-color: #27372E;
+      --primary-soft: #1E3328;
+      --accent-soft: #1E3328;
+      --accent-border: #2D493A;
+    }
+
+    /* Color scheme accents */
+    body.accent-emerald { --accent: #10B981; --accent-soft: #ECFDF5; --accent-border: #A7F3D0; }
+    body.accent-forest { --accent: #34765A; --accent-soft: #EAF5EE; --accent-border: #D1E7DA; }
+    body.accent-teal { --accent: #0D9488; --accent-soft: #F0FDFA; --accent-border: #99F6E4; }
+    body.accent-ocean { --accent: #2563EB; --accent-soft: #EFF6FF; --accent-border: #BFDBFE; }
+    body.accent-coral { --accent: #EA580C; --accent-soft: #FFF7ED; --accent-border: #FED7AA; }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: #EBF1ED;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      position: relative;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease;
+    }
+
+    /* Desktop Outer Presentation Atmosphere */
+    .desktop-bg-decor {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .bg-circle-1 {
+      position: absolute;
+      top: -15%;
+      left: 10%;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(168, 213, 186, 0.28) 0%, rgba(168, 213, 186, 0) 70%);
+      filter: blur(40px);
+    }
+    .bg-circle-2 {
+      position: absolute;
+      bottom: -10%;
+      right: 15%;
+      width: 550px;
+      height: 550px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(52, 118, 90, 0.15) 0%, rgba(52, 118, 90, 0) 70%);
+      filter: blur(50px);
+    }
+
+    /* Top Controls Bar for Desktop Presentation */
+    .presentation-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 900px;
+      margin-bottom: 20px;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 10px 20px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    }
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      color: #26352D;
+    }
+    .brand-logo-icon {
+      width: 26px;
+      height: 26px;
+      background: #34765A;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    .control-buttons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-desktop-ctrl {
+      background: #FFFFFF;
+      border: 1px solid #D9E4DD;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #34483E;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-desktop-ctrl:hover {
+      background: #34765A;
+      color: white;
+      border-color: #34765A;
+      transform: translateY(-1px);
+    }
+
+    /* =========================================
+       SMARTPHONE DEVICE MOCKUP WRAPPER
+       ========================================= */
+    .device-container {
+      position: relative;
+      z-index: 10;
+      perspective: 1200px;
+    }
+
+    .device-mockup {
+      width: var(--phone-width);
+      height: var(--phone-height);
+      background-color: var(--bg-app);
+      border-radius: 52px;
+      box-shadow:
+        0 0 0 12px #262E29,
+        0 0 0 14px #3C4A42,
+        0 25px 65px -10px rgba(24, 45, 33, 0.35),
+        0 15px 35px -5px rgba(0, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 4px solid #161D19;
+      transform-origin: center;
+      transition: all 0.3s ease;
+    }
+
+    /* Side hardware buttons on phone frame */
+    .device-mockup::before {
+      content: '';
+      position: absolute;
+      left: -17px;
+      top: 110px;
+      width: 4px;
+      height: 32px;
+      background: #2D3730;
+      border-radius: 2px 0 0 2px;
+      box-shadow: 0 45px 0 #2D3730, 0 85px 0 #2D3730;
+    }
+    .device-mockup::after {
+      content: '';
+      position: absolute;
+      right: -17px;
+      top: 140px;
+      width: 4px;
+      height: 52px;
+      background: #2D3730;
+      border-radius: 0 2px 2px 0;
+    }
+
+    /* Top Status Bar & Dynamic Island */
+    .status-bar {
+      height: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      z-index: 50;
+      position: relative;
+      background: transparent;
+      user-select: none;
+    }
+    .dynamic-island {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 115px;
+      height: 28px;
+      background-color: #000000;
+      border-radius: 20px;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 10px;
+      box-shadow: inset 0 0 1px 1px rgba(255, 255, 255, 0.1);
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .island-camera {
+      width: 10px;
+      height: 10px;
+      background: #08111E;
+      border-radius: 50%;
+      border: 1.5px solid #142436;
+      margin-left: 6px;
+    }
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    /* Screen Views Manager - Smooth Scrolling & Generous Bottom Padding */
+    .app-screen-viewport {
+      flex: 1 1 0;
+      min-height: 0;
+      height: calc(100% - 44px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+    .app-screen-viewport::-webkit-scrollbar {
+      display: none;
+    }
+    .app-screen-viewport {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* CRITICAL FIX: padding-bottom 130px ensures no element at the bottom is ever blocked by the bottom nav */
+    .screen-view {
+      display: none;
+      flex-direction: column;
+      flex: 0 0 auto;
+      width: 100%;
+      padding: 16px 20px calc(112px + env(safe-area-inset-bottom)) 20px;
+      min-height: 100%;
+      animation: fadeIn 0.25s ease-out;
+    }
+    .screen-view.active {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Bottom spacing bumper */
+    .bottom-scroll-spacer {
+      height: 24px;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    /* Bottom App Navigation Bar */
+    .bottom-nav {
+      height: 72px;
+      min-height: 72px;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 10px 10px 10px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 40;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
+    }
+    [data-theme="dark"] .bottom-nav {
+      background: rgba(27, 38, 32, 0.95);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+      min-width: 52px;
+    }
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 2;
+      transition: transform 0.2s;
+    }
+    .nav-item.active {
+      color: var(--accent);
+    }
+    .nav-item.active svg {
+      transform: translateY(-2px);
+    }
+    .nav-item:hover {
+      color: var(--accent);
+    }
+
+    /* Home Indicator bar on modern iPhone */
+    .home-indicator {
+      position: absolute;
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 134px;
+      height: 4px;
+      background-color: var(--text-main);
+      opacity: 0.3;
+      border-radius: 3px;
+      z-index: 55;
+      pointer-events: none;
+    }
+
+    /* =========================================
+       COMMON APP COMPONENTS & UI ELEMENTS
+       ========================================= */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .greeting-text {
+      font-size: 13px;
+      color: var(--text-sub);
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+    .screen-heading {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-main);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+    .header-btn:hover {
+      background: var(--primary-soft);
+      border-color: var(--accent);
+    }
+    .badge-dot {
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      width: 8px;
+      height: 8px;
+      background: #EF4444;
+      border-radius: 50%;
+      border: 2px solid var(--card-bg);
+    }
+    .avatar-btn {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    /* =========================================
+       HERO DAILY PROGRESS CARD (FIXED NO TEXT OVERLAP)
+       ========================================= */
+    .hero-progress-card {
+      flex: 0 0 auto;
+      min-height: 176px;
+      background: linear-gradient(135deg, #245741 0%, #193E2E 100%);
+      color: #FFFFFF;
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 25px -5px rgba(36, 87, 65, 0.4);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .hero-progress-card::after {
+      content: '';
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      pointer-events: none;
+    }
+    .progress-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .progress-label-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #A8D5BA;
+      font-weight: 700;
+    }
+    .progress-percent {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1;
+      color: #FFFFFF;
+      letter-spacing: -0.5px;
+    }
+    .progress-headline {
+      font-size: 18px;
+      font-weight: 700;
+      color: #FFFFFF;
+      line-height: 1.3;
+    }
+    .progress-bar-track {
+      width: 100%;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #A8D5BA 0%, #6EE7B7 100%);
+      border-radius: 20px;
+      width: 50%;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .progress-card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #C3E2D0;
+    }
+
+    /* Summary Stats Grid */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .stat-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .stat-icon.streak { background: #FEF3C7; color: #D97706; }
+    .stat-icon.xp { background: #E0E7FF; color: #4F46E5; }
+    .stat-icon.goal { background: #ECFDF5; color: #059669; }
+    .stat-icon.rate { background: #F3E8FF; color: #7C3AED; }
+
+    .stat-info .stat-num {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+    .stat-info .stat-label {
+      font-size: 11px;
+      color: var(--text-sub);
+      font-weight: 500;
+    }
+
+    /* Section Header */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .btn-add-habit {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      background: var(--accent);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-add-habit:hover {
+      opacity: 0.92;
+      transform: scale(1.03);
+    }
+
+    /* =========================================
+       HABITS LIST (RESTRUCTURED - ZERO COLLISION)
+       ========================================= */
+    .habit-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .habit-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .habit-card:hover {
+      border-color: var(--accent-border);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+    }
+    .habit-card.completed {
+      background: var(--primary-soft);
+      border-color: var(--accent-border);
+    }
+    .habit-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+    }
+    .habit-icon-box {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      background: #EDF7F1;
+      color: var(--accent);
+      transition: all 0.2s;
+      margin-top: 2px;
+    }
+    .habit-card.completed .habit-icon-box {
+      background: #FFFFFF;
+    }
+    .habit-details {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      min-width: 0;
+    }
+    .habit-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+    }
+    .habit-card.completed .habit-title {
+      text-decoration: line-through;
+      color: var(--text-sub);
+    }
+    .habit-subtext {
+      font-size: 12px;
+      color: var(--text-sub);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+    }
+    .habit-streak-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      font-weight: 700;
+      color: #D97706;
+      font-size: 11px;
+      background: #FEF3C7;
+      padding: 1px 6px;
+      border-radius: 6px;
+      margin-top: 3px;
+      width: fit-content;
+    }
+    .quantity-control {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 5px;
+    }
+    .btn-qty {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-qty:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .habit-actions-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    /* Circle Checkbox Button */
+    .btn-check-habit {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid #CBD5E1;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: transparent;
+      flex-shrink: 0;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .btn-check-habit:hover {
+      border-color: var(--accent);
+      transform: scale(1.08);
+    }
+    .habit-card.completed .btn-check-habit {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #FFFFFF;
+      transform: scale(1.02);
+    }
+    .btn-check-habit svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 3;
+    }
+
+    /* Habit Action Menu (trash) */
+    .btn-habit-delete {
+      background: none;
+      border: none;
+      color: #94A3B8;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .btn-habit-delete:hover {
+      color: var(--danger);
+      background: var(--danger-soft);
+    }
+
+    /* Motivational & Streak Freeze Cards */
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+    .feature-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .freeze-card .feature-icon-box { background: #E0F2FE; color: #0284C7; }
+    .quote-card .feature-icon-box { background: #FEF3C7; color: #B45309; }
+    .feature-content h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+    .feature-content p {
+      font-size: 12px;
+      color: var(--text-sub);
+      line-height: 1.4;
+    }
+
+    /* =========================================
+       ANIMATED SLIDING PILL SELECTOR (Ô SELECT ĐEN CHẠY THEO)
+       ========================================= */
+    .sliding-segmented-bar {
+      position: relative;
+      display: flex;
+      background: #E5ECE7;
+      border-radius: 16px;
+      padding: 4px;
+      margin-bottom: 16px;
+      user-select: none;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    [data-theme="dark"] .sliding-segmented-bar {
+      background: #27372E;
+    }
+    .sliding-indicator-pill {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      left: 4px;
+      background: #26352D; /* Ô select đen */
+      border-radius: 12px;
+      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), width 0.25s ease;
+      z-index: 1;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    [data-theme="dark"] .sliding-indicator-pill {
+      background: #34765A;
+    }
+    .segment-tab-btn {
+      flex: 1;
+      text-align: center;
+      padding: 8px 0;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      color: #7B8980;
+      cursor: pointer;
+      position: relative;
+      z-index: 2;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: color 0.25s ease;
+    }
+    .segment-tab-btn:focus,
+    .segment-tab-btn:focus-visible {
+      outline: none;
+    }
+    .segment-tab-btn.active {
+      color: #FFFFFF !important;
+    }
+
+    /* =========================================
+       CALENDAR SCREEN (EXPANDED DYNAMIC LOGIC)
+       ========================================= */
+    .calendar-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 22px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    .cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .cal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .cal-nav-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+    .cal-nav-btn:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+    .cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin-bottom: 8px;
+    }
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .cal-day {
+      aspect-ratio: 1;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      border: 2px solid transparent;
+    }
+    .cal-day:hover {
+      transform: scale(1.08);
+      z-index: 2;
+    }
+    .cal-day.empty {
+      cursor: default;
+      background: transparent !important;
+      opacity: 0.3;
+    }
+    .cal-day.level-0 { background: #F1F5F2; color: #8C9990; }
+    .cal-day.level-1 { background: #D1E7DA; color: #214F3A; }
+    .cal-day.level-2 { background: #A8D5BA; color: #16402E; }
+    .cal-day.level-3 { background: #60B788; color: #0C3322; }
+    .cal-day.level-4 { background: #34765A; color: #FFFFFF; }
+    
+    /* Active selected day in Calendar */
+    .cal-day.selected {
+      border: 2px solid #26352D !important;
+      box-shadow: 0 0 0 2px rgba(52, 118, 90, 0.4), 0 3px 8px rgba(0, 0, 0, 0.1);
+      font-weight: 800;
+      transform: scale(1.08);
+      z-index: 3;
+      animation: calPulseBorder 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    [data-theme="dark"] .cal-day.selected {
+      border: 2px solid #6EE7B7 !important;
+      box-shadow: 0 0 0 2px rgba(110, 231, 183, 0.4), 0 3px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    @keyframes calPulseBorder {
+      0% { transform: scale(0.92); }
+      50% { transform: scale(1.14); }
+      100% { transform: scale(1.08); }
+    }
+
+    .cal-nav-month-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+      color: var(--text-sub);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .cal-nav-month-btn:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Today cell marker dot */
+    .cal-day.is-today::after {
+      content: '';
+      position: absolute;
+      bottom: 3px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.85;
+    }
+
+    .cal-today-badge-btn {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-border);
+      border-radius: 12px;
+      padding: 1px 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .cal-today-badge-btn:hover {
+      background: var(--accent);
+      color: #FFFFFF;
+    }
+
+    .cal-legend {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+    .legend-box {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+
+    /* Selected Day Details Card */
+    .day-detail-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 16px;
+      transition: all 0.3s ease;
+    }
+    .day-detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+    .day-detail-date {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+    .mood-selector {
+      display: flex;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .mood-btn {
+      background: var(--bg-app);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 3px 6px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+    .mood-btn.active, .mood-btn:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      transform: scale(1.15);
+    }
+
+    /* =========================================
+       STATISTICS SCREEN (AGGREGATED FROM LOW TO HIGH)
+       ========================================= */
+    .chart-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 22px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .bar-chart-container {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      height: 150px;
+      padding: 10px 0 0 0;
+      border-bottom: 1px dashed var(--border-color);
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+    .chart-col {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      position: relative;
+    }
+    .chart-col:hover .bar-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(-4px);
+    }
+    .chart-bar {
+      width: 75%;
+      max-width: 26px;
+      border-radius: 8px 8px 3px 3px;
+      background: linear-gradient(180deg, #A8D5BA 0%, #34765A 100%);
+      transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .chart-bar.current {
+      background: linear-gradient(180deg, #6EE7B7 0%, #10B981 100%);
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);
+    }
+    .bar-tooltip {
+      position: absolute;
+      top: -28px;
+      background: #26352D;
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .chart-labels {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+    .chart-label-item {
+      flex: 1;
+      text-align: center;
+    }
+
+    /* Habit Performance List */
+    .perf-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .perf-item:last-child {
+      border-bottom: none;
+    }
+    .perf-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .perf-bar-bg {
+      height: 8px;
+      background: var(--bg-app);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .perf-bar-val {
+      height: 100%;
+      border-radius: 10px;
+      background: var(--accent);
+      transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Period Summary Box */
+    .stats-summary-box {
+      background: var(--primary-soft);
+      border: 1px solid var(--accent-border);
+      border-radius: 16px;
+      padding: 14px;
+      font-size: 12px;
+      color: var(--text-main);
+      line-height: 1.4;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    /* =========================================
+       BADGES / GAMIFICATION SCREEN (FIXED OVERFLOW)
+       ========================================= */
+    .level-hero-card {
+      background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+      color: #FFFFFF;
+      border-radius: 22px;
+      padding: 18px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .level-hero-card::after {
+      content: '★';
+      position: absolute;
+      right: 10px;
+      top: -10px;
+      font-size: 110px;
+      color: rgba(255, 255, 255, 0.04);
+      pointer-events: none;
+    }
+    .level-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .level-badge-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
+      flex-shrink: 0;
+    }
+    .level-info-col {
+      flex: 1;
+      min-width: 0;
+    }
+    .level-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: #FFFFFF;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .level-sub {
+      font-size: 12px;
+      color: #94A3B8;
+    }
+
+    .badge-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .badge-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .badge-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    }
+    .badge-card.locked {
+      opacity: 0.65;
+      filter: grayscale(0.85);
+      background: var(--bg-app);
+    }
+    .badge-card.locked::after {
+      content: '🔒';
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 12px;
+    }
+    .badge-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 8px;
+      background: #F3F4F6;
+    }
+    .badge-card.unlocked .badge-icon-box {
+      background: #FEF3C7;
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.25);
+    }
+    .badge-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 3px;
+    }
+    .badge-desc {
+      font-size: 11px;
+      color: var(--text-sub);
+      line-height: 1.3;
+    }
+
+    /* =========================================
+       SETTINGS SCREEN (CLEAN REORGANIZED LAYOUT)
+       ========================================= */
+    .profile-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .profile-avatar-large {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #D1E7DA;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 800;
+      color: #214F3A;
+      flex-shrink: 0;
+    }
+    .profile-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .profile-info h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .profile-info p {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+    }
+    .btn-edit-profile {
+      background: var(--primary-soft);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .settings-group {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 6px 16px;
+      margin-bottom: 16px;
+    }
+    .settings-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-color);
+      gap: 12px;
+    }
+    .settings-item:last-child {
+      border-bottom: none;
+    }
+    .settings-item-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+    .settings-item-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.3;
+    }
+    .settings-item-desc {
+      font-size: 11px;
+      color: var(--text-sub);
+      line-height: 1.3;
+      margin-top: 2px;
+    }
+
+    /* Stacked Settings Item for Color Palette to prevent text collision */
+    .settings-item-stacked {
+      display: flex;
+      flex-direction: column;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-color);
+      gap: 12px;
+    }
+    .settings-item-stacked:last-child {
+      border-bottom: none;
+    }
+    .accent-palette-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-app);
+      border-radius: 14px;
+      padding: 8px 14px;
+    }
+    .palette-circle {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 0 0 1px #CBD5E1;
+      transition: transform 0.2s;
+    }
+    .palette-circle.active {
+      transform: scale(1.25);
+      box-shadow: 0 0 0 2px var(--text-main);
+    }
+
+    /* iOS Style Switch */
+    .switch-toggle {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+    .switch-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .switch-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #CBD5E1;
+      transition: .3s;
+      border-radius: 34px;
+    }
+    .switch-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    input:checked + .switch-slider {
+      background-color: var(--accent);
+    }
+    input:checked + .switch-slider:before {
+      transform: translateX(20px);
+    }
+
+    /* =========================================
+       MODALS & POPUPS
+       ========================================= */
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 100;
+      display: flex;
+      align-items: flex-end;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-backdrop.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-sheet {
+      background: var(--card-bg);
+      width: 100%;
+      border-radius: 28px 28px 0 0;
+      padding: 24px 20px 32px 20px;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      max-height: 85%;
+      overflow-y: auto;
+    }
+    .modal-backdrop.show .modal-sheet {
+      transform: translateY(0);
+    }
+    .modal-drag-pill {
+      width: 40px;
+      height: 4px;
+      background: var(--border-color);
+      border-radius: 2px;
+      margin: 0 auto 16px auto;
+    }
+    .modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%;
+      height: 46px;
+      padding: 0 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-app);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus {
+      border-color: var(--accent);
+      background: var(--card-bg);
+    }
+
+    .form-row { display: flex; gap: 10px; }
+    .form-row .form-input { min-width: 0; }
+    .form-row .form-input.qty-num { flex: 1; }
+    .form-row .form-input.qty-unit { flex: 1.4; }
+    .form-hint {
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+    .btn-habit-edit {
+      background: none;
+      border: none;
+      color: #94A3B8;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .btn-habit-edit:hover {
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .icon-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+    .icon-opt {
+      aspect-ratio: 1;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-app);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .icon-opt.selected {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      transform: scale(1.1);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .btn-modal-cancel {
+      flex: 1;
+      height: 46px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-app);
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-modal-save {
+      flex: 2;
+      height: 46px;
+      border-radius: 12px;
+      border: none;
+      background: var(--accent);
+      color: #FFFFFF;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-modal-save:hover {
+      opacity: 0.9;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: absolute;
+      top: 50px;
+      left: 20px;
+      right: 20px;
+      z-index: 120;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .toast-msg {
+      background: #26352D;
+      color: #FFFFFF;
+      padding: 10px 16px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      transform: translateY(-20px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: auto;
+    }
+    .toast-msg.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .toast-undo-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: #A8D5BA;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-left: 4px;
+    }
+
+
+    /* Keep the dashboard cards at their natural height; scroll the content instead
+       of allowing flexbox to compress cards underneath the fixed bottom navigation. */
+    .app-screen-viewport > .screen-view.active {
+      flex: 0 0 auto;
+    }
+    .hero-progress-card > * {
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 500px) {
+      .screen-view {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      .hero-progress-card {
+        min-height: 176px;
+        padding: 18px;
+      }
+      .progress-card-top {
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .progress-percent {
+        flex-shrink: 0;
+      }
+      .progress-card-bottom {
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .progress-card-bottom span:last-child {
+        text-align: right;
+      }
+      .bottom-nav {
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+      }
+    }
+
+    /* Fullscreen mobile responsive adaptation */
+    @media (max-width: 500px) {
+      body {
+        padding: 0;
+        background-color: var(--bg-app);
+      }
+      .presentation-controls, .desktop-bg-decor {
+        display: none !important;
+      }
+      .device-container {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+      }
+      .device-mockup {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+      }
+      .device-mockup::before, .device-mockup::after {
+        display: none;
+      }
+      .status-bar {
+        padding-top: 8px;
+      }
+    }
+
+    /* ==========================================================================
+       REACT-BITS INSPIRED MODERN ANIMATIONS & MICRO-INTERACTIONS
+       (Aurora, Spotlight, BorderBeam, ShinyText, TiltedCard, ClickSpark, FloatXP)
+       ========================================================================== */
+
+    /* 1. Aurora Mesh Background */
+    .aurora-mesh {
+      position: absolute;
+      inset: -50%;
+      background: 
+        radial-gradient(ellipse at 20% 25%, rgba(168, 213, 186, 0.45) 0%, transparent 45%),
+        radial-gradient(ellipse at 80% 30%, rgba(52, 118, 90, 0.35) 0%, transparent 40%),
+        radial-gradient(ellipse at 45% 75%, rgba(110, 231, 183, 0.35) 0%, transparent 50%),
+        radial-gradient(ellipse at 75% 85%, rgba(36, 87, 65, 0.3) 0%, transparent 45%),
+        radial-gradient(ellipse at 15% 75%, rgba(168, 213, 186, 0.3) 0%, transparent 40%);
+      filter: blur(60px);
+      animation: auroraFlow 18s ease-in-out infinite alternate;
+      pointer-events: none;
+      will-change: transform;
+    }
+    @keyframes auroraFlow {
+      0% { transform: rotate(0deg) scale(1) translate(0, 0); }
+      50% { transform: rotate(5deg) scale(1.1) translate(35px, -25px); }
+      100% { transform: rotate(-4deg) scale(0.95) translate(-30px, 30px); }
+    }
+
+    /* 2. Spotlight Card Effect */
+    .spotlight-card {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .spotlight-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(
+        240px circle at var(--spotlight-x, -500px) var(--spotlight-y, -500px),
+        rgba(52, 118, 90, 0.12),
+        transparent 75%
+      );
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 1;
+    }
+    .spotlight-card:hover::before {
+      opacity: 1;
+    }
+    [data-theme="dark"] .spotlight-card::before {
+      background: radial-gradient(
+        240px circle at var(--spotlight-x, -500px) var(--spotlight-y, -500px),
+        rgba(110, 231, 183, 0.18),
+        transparent 75%
+      );
+    }
+    .spotlight-card > * {
+      position: relative;
+      z-index: 2;
+    }
+    /* Ensure habit-card layout unaffected by spotlight overlay */
+    .habit-card.spotlight-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* ✨ Habit card: smooth pop-in transition placeholder */
+    .habit-card {
+      will-change: opacity, transform;
+    }
+
+    /* 3. Border Beam Effect (Conic Glowing Traveling Border) */
+    /* Phủ viền toàn bộ khung viền máy (.device-mockup) hoặc các card lớn */
+    .border-beam-card {
+      position: relative;
+    }
+    .border-beam-card::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: inherit;
+      padding: 3px;
+      background: conic-gradient(
+        from var(--beam-angle, 0deg) at 50% 50%,
+        transparent 0deg,
+        transparent 65deg,
+        #6EE7B7 120deg,
+        #A8D5BA 180deg,
+        transparent 250deg,
+        transparent 360deg
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      z-index: 50;
+      animation: borderBeamRotate 6s linear infinite;
+    }
+    @keyframes borderBeamRotate {
+      from { --beam-angle: 0deg; }
+      to { --beam-angle: 360deg; }
+    }
+    @property --beam-angle {
+      syntax: '<angle>';
+      inherits: false;
+      initial-value: 0deg;
+    }
+
+    /* 4. Shiny Text Sweep (Chạy lấp lánh 2.5s rồi tự động trở về màu chữ bình thường) */
+    .shiny-text {
+      background: linear-gradient(
+        115deg,
+        currentColor 15%,
+        #A8D5BA 38%,
+        #6EE7B7 50%,
+        #FFFFFF 65%,
+        currentColor 85%
+      );
+      background-size: 250% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shinyTextSweep 2.8s cubic-bezier(0.2, 0, 0, 1) 1 forwards;
+      display: inline-block;
+    }
+    @keyframes shinyTextSweep {
+      0% {
+        background-position: 180% 0;
+      }
+      75% {
+        background-position: -80% 0;
+      }
+      100% {
+        background-position: -180% 0;
+        -webkit-text-fill-color: currentColor;
+      }
+    }
+
+    .shiny-pill-badge {
+      position: relative;
+      overflow: hidden;
+    }
+    .shiny-pill-badge::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -150%;
+      width: 80%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      animation: shinePill 3.5s infinite;
+      pointer-events: none;
+    }
+    @keyframes shinePill {
+      0%, 30% { left: -150%; }
+      70%, 100% { left: 150%; }
+    }
+
+    /* 5. Tilted 3D Card Interaction */
+    .tilted-card {
+      transform-style: preserve-3d;
+      transition: transform 0.18s cubic-bezier(0.2, 0, 0.2, 1);
+      will-change: transform;
+    }
+
+    /* 6. Floating XP Bubble */
+    .xp-float-bubble {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #1E4634, #2A664D);
+      color: #FFFFFF;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(24, 45, 33, 0.45);
+      border: 1.5px solid rgba(168, 213, 186, 0.6);
+      pointer-events: none;
+      animation: floatUpFade 1.15s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+      z-index: 9999;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    @keyframes floatUpFade {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, 0) scale(0.6) rotate(-5deg);
+      }
+      25% {
+        opacity: 1;
+        transform: translate(-50%, -20px) scale(1.12) rotate(3deg);
+      }
+      75% {
+        opacity: 1;
+        transform: translate(-50%, -50px) scale(1) rotate(0deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -75px) scale(0.85) rotate(6deg);
+      }
+    }
+
+    /* 7. Screen View Stagger Transition */
+    .screen-view.active {
+      animation: screenEnterAnim 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes screenEnterAnim {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.985);
+        filter: blur(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    /* 8. Elastic Button Press */
+    .btn-check-habit:active,
+    .cal-nav-btn:active,
+    .cal-nav-month-btn:active,
+    .btn-add-habit:active,
+    .btn-qty:active,
+    .segment-tab-btn:active,
+    .badge-card:active {
+      transform: scale(0.91) !important;
+      transition: transform 0.08s ease !important;
+    }
+
+    /* 9. Calendar Heatmap Tooltip */
+    .cal-tooltip {
+      position: absolute;
+      background: #1B2620;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 10px;
+      border-radius: 8px;
+      pointer-events: none;
+      z-index: 9999;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transform: translate(-50%, -125%);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      white-space: nowrap;
+    }
+    .cal-tooltip::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 4px 4px 0 4px;
+      border-style: solid;
+      border-color: #1B2620 transparent transparent transparent;
+    }
+
+    /* 10. React Bits Inspired: Badges & Stats Enhanced Effects */
+    .badge-card {
+      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .badge-card:hover {
+      transform: translateY(-5px) scale(1.03);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+      border-color: var(--accent);
+    }
+    .badge-card.unlocked .badge-icon-box {
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .badge-card.unlocked:hover .badge-icon-box {
+      transform: scale(1.18) rotate(6deg);
+    }
+    .badge-card.unlocked::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -60%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(251, 191, 36, 0.12) 0%, transparent 60%);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .badge-card.unlocked:hover::before {
+      opacity: 1;
+    }
+
+    /* Chart Bar Wave pop-in */
+    .chart-bar {
+      transform-origin: bottom;
+      transition: height 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.2s ease, filter 0.2s ease;
+    }
+    .chart-col:hover .chart-bar {
+      transform: scaleX(1.08);
+      filter: brightness(1.15);
+    }
+
+    /* Week view dynamic badge chip in day details */
+    .cal-week-badge-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-border);
+      padding: 3px 10px;
+      border-radius: 14px;
+      margin-bottom: 8px;
+    }
+  
+    /* ==========================================================================
+       SPLASH / INTRO – hiển thị bên trong khung điện thoại (.device-mockup)
+       Mọi selector đều nằm trong .ht-splash, keyframes có tiền tố "sp-"
+       để không đụng tới phần còn lại của app.
+       ========================================================================== */
+    .ht-splash {
+      --sp-bg: #eaf4ec; --sp-surface: #ffffff; --sp-primary: #34755a; --sp-primary-soft: #d3e8da;
+      --sp-ink: #233a31; --sp-muted: #5d7468; --sp-line: #dbe8df;
+      position: absolute;
+      inset: 0;
+      z-index: 58; /* trên status bar & nav, dưới Dynamic Island (60) */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      background: var(--sp-bg);
+      color: var(--sp-ink);
+      overflow: hidden;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    [data-theme="dark"] .ht-splash {
+      --sp-bg: #13201a; --sp-surface: #1b2c24; --sp-primary: #5fb48a; --sp-primary-soft: #24402f;
+      --sp-ink: #e6f2ea; --sp-muted: #9db5a8; --sp-line: #2a4136;
+    }
+    .ht-splash[hidden] { display: none; }
+    .ht-splash.leave { pointer-events: none; animation: sp-leave .7s cubic-bezier(.5,0,.8,.4) forwards; }
+
+    @keyframes sp-fadeIn { from { opacity: 0 } to { opacity: 1 } }
+    @keyframes sp-fadeInUp { from { opacity: 0; transform: translate3d(0,24px,0) } to { opacity: 1; transform: none } }
+    @keyframes sp-bounceIn { 0% { opacity: 0; transform: scale3d(.3,.3,.3) } 20% { transform: scale3d(1.15,1.15,1.15) } 40% { transform: scale3d(.9,.9,.9) } 60% { opacity: 1; transform: scale3d(1.04,1.04,1.04) } 80% { transform: scale3d(.97,.97,.97) } 100% { opacity: 1; transform: none } }
+    @keyframes sp-bounceInUp { 0% { opacity: 0; transform: translate3d(0,70px,0) } 60% { opacity: 1; transform: translate3d(0,-14px,0) } 75% { transform: translate3d(0,6px,0) } 90% { transform: translate3d(0,-3px,0) } 100% { opacity: 1; transform: none } }
+    @keyframes sp-draw { to { stroke-dashoffset: 0 } }
+    @keyframes sp-grow { 0% { transform: scale(0) rotate(-50deg) } 60% { transform: scale(1.2) rotate(8deg) } 100% { transform: scale(1) rotate(0) } }
+    @keyframes sp-sway { 0%,100% { transform: rotate(-5deg) } 50% { transform: rotate(5deg) } }
+    @keyframes sp-ring { from { transform: scale(.7); opacity: .6 } to { transform: scale(2.6); opacity: 0 } }
+    @keyframes sp-burst { 0% { opacity: 1; transform: rotate(var(--a)) translateX(30px) scale(.2) } 100% { opacity: 0; transform: rotate(var(--a)) translateX(var(--d)) scale(1) } }
+    @keyframes sp-orbit { to { transform: rotate(360deg) } }
+    @keyframes sp-drift { 0%,100% { transform: translate(0,0) scale(1) } 50% { transform: translate(30px,-40px) scale(1.15) } }
+    @keyframes sp-load { from { transform: scaleX(0) } to { transform: scaleX(1) } }
+    @keyframes sp-leave { to { opacity: 0; transform: scale(1.18); filter: blur(6px) } }
+
+    .ht-splash .sp-blob { position: absolute; border-radius: 50%; background: var(--sp-primary-soft); filter: blur(50px); opacity: .9; animation: sp-drift 6s ease-in-out infinite; pointer-events: none; }
+    .ht-splash .sp-b1 { width: 260px; height: 260px; top: 8%; left: -60px; }
+    .ht-splash .sp-b2 { width: 320px; height: 320px; bottom: 4%; right: -90px; animation-delay: -3s; }
+    .ht-splash .sp-logo { position: relative; width: 120px; height: 120px; display: grid; place-items: center; }
+    .ht-splash .sp-logo .sp-wave { position: absolute; inset: 6px; border-radius: 50%; background: var(--sp-primary); opacity: 0; }
+    .ht-splash .sp-logo .sp-badge { position: absolute; inset: 0; border-radius: 34px; background: var(--sp-surface); box-shadow: 0 16px 40px rgba(52,117,90,.28); opacity: 0; }
+    .ht-splash .sp-logo .sp-orbit { position: absolute; inset: -14px; border-radius: 50%; border: 1.5px dashed var(--sp-primary); opacity: 0; }
+    .ht-splash .sp-logo .sp-orbit::after { content: ""; position: absolute; top: -5px; left: 50%; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: var(--sp-primary); }
+    .ht-splash .sp-logo svg { position: relative; width: 64px; height: 64px; overflow: visible; transform-origin: 18% 82%; transform: scale(0); }
+    .ht-splash .sp-logo path { fill: none; stroke: var(--sp-primary); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+    .ht-splash .sp-logo path.sp-fill { fill: var(--sp-primary); fill-opacity: 0; stroke-width: 0; stroke-dasharray: none; }
+    .ht-splash .sp-logo i { position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -4.5px; border-radius: 50% 0 50% 0; background: var(--sp-primary); opacity: 0; }
+    .ht-splash .sp-logo i:nth-of-type(even) { background: #8cc9a6; width: 6px; height: 6px; margin: -3px; }
+    .ht-splash .sp-title { margin: 0; font-size: 36px; font-weight: 800; letter-spacing: -.02em; display: flex; color: var(--sp-ink); }
+    .ht-splash .sp-title span { display: inline-block; opacity: 0; }
+    .ht-splash .sp-tag { margin: -8px 0 0; font-size: 15px; color: var(--sp-muted); opacity: 0; }
+    .ht-splash .sp-bar { width: 140px; height: 5px; border-radius: 5px; background: var(--sp-line); overflow: hidden; opacity: 0; margin-top: 14px; }
+    .ht-splash .sp-bar b { display: block; height: 100%; transform-origin: left; transform: scaleX(0); border-radius: 5px; background: linear-gradient(90deg, var(--sp-primary), #8cc9a6, var(--sp-primary)); background-size: 200% 100%; }
+
+    .ht-splash.play .sp-badge { animation: sp-bounceIn .9s cubic-bezier(.2,.8,.2,1) .15s both; }
+    .ht-splash.play .sp-wave { animation: sp-ring 1.3s .2s ease-out 1, sp-ring 1.3s 1.5s ease-out 1; }
+    .ht-splash.play .sp-orbit { animation: sp-fadeIn .4s .7s forwards, sp-orbit 2.6s .7s linear infinite; }
+    .ht-splash.play .sp-logo svg { animation: sp-grow .9s cubic-bezier(.3,1.4,.5,1) .6s forwards, sp-sway 2.4s 2s ease-in-out infinite; }
+    .ht-splash.play .sp-logo path.sp-stroke { animation: sp-draw .9s ease-in-out .7s forwards; }
+    .ht-splash.play .sp-logo path.sp-fill { animation: sp-fadeIn .5s 1.5s forwards; }
+    .ht-splash.play .sp-logo i { animation: sp-burst 1s 1.5s ease-out both; }
+    .ht-splash.play .sp-title span { animation: sp-bounceInUp .8s calc(1.5s + var(--n) * .06s) both; }
+    .ht-splash.play .sp-tag { animation: sp-fadeInUp .7s 2.2s both; }
+    .ht-splash.play .sp-bar { animation: sp-fadeIn .4s 2.4s both; }
+    .ht-splash.play .sp-bar b { animation: sp-load 1.4s 2.5s cubic-bezier(.4,0,.2,1) forwards; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ht-splash, .ht-splash * { animation-duration: .01ms !important; animation-delay: 0s !important; }
+    }
+  
+    /* ==========================================================================
+       MOBILE / PHONE: mở trên điện thoại thật => chỉ còn giao diện app full màn hình
+       (không nền, không viền/khung máy, không status bar giả, không home indicator giả)
+       ========================================================================== */
+    @media (max-width: 500px), (max-height: 500px) and (pointer: coarse) {
+      html, body {
+        height: 100%;
+        overflow: hidden;
+        overscroll-behavior: none;
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        display: block;
+        padding: 0;
+        min-height: 100dvh;
+        background: var(--bg-app);
+      }
+      /* bỏ nền trang trí + thanh điều khiển desktop */
+      .desktop-bg-decor, .presentation-controls { display: none !important; }
+
+      /* khung máy -> full màn hình, không viền/bóng/bo góc */
+      .device-container {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        perspective: none;
+      }
+      .device-mockup {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        transform: none;
+      }
+      .device-mockup::before,
+      .device-mockup::after,
+      .device-mockup.border-beam-card::after { display: none !important; }
+
+      /* bỏ phần phần cứng giả */
+      .status-bar, .dynamic-island, .home-indicator { display: none !important; }
+
+      /* nội dung tránh tai thỏ / thanh trạng thái thật */
+      .app-screen-viewport { height: 100%; }
+      .screen-view {
+        padding-top: calc(16px + env(safe-area-inset-top, 0px));
+        padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+      }
+      .bottom-nav {
+        height: calc(62px + max(10px, env(safe-area-inset-bottom, 0px)));
+        min-height: 0;
+        padding: 0 10px max(10px, env(safe-area-inset-bottom, 0px)) 10px;
+      }
+      .toast-container { top: calc(12px + env(safe-area-inset-top, 0px)); }
+      .modal-sheet { padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
+
+      /* iOS không tự zoom khi chạm vào ô nhập */
+      .form-input { font-size: 16px; }
+    }
+  </style>
+</head>
+<body class="accent-forest">
+
+  <!-- Desktop Presentation Ambient Background Decor (React Bits Aurora) -->
+  <div class="desktop-bg-decor">
+    <div class="aurora-mesh"></div>
+    <div class="bg-circle-1"></div>
+    <div class="bg-circle-2"></div>
+  </div>
+
+  <!-- Desktop Presentation Controls Header -->
+  <div class="presentation-controls">
+    <div class="brand-title">
+      <div class="brand-logo-icon">🌱</div>
+      <span>Habit Tracker Prototype – Animated React Bits Edition</span>
+    </div>
+    <div class="control-buttons">
+      <button class="btn-desktop-ctrl" id="btn-toggle-bg" title="Đổi màu nền">
+        <span>🎨</span> Nền trống
+      </button>
+      <button class="btn-desktop-ctrl" id="btn-desktop-dark" title="Chế độ Tối / Sáng">
+        <span id="dark-icon">🌙</span> Dark Mode
+      </button>
+      <button class="btn-desktop-ctrl" id="btn-reset-sample" title="Nạp lại dữ liệu gốc">
+        <span>🔄</span> Reset Mẫu
+      </button>
+    </div>
+  </div>
+
+  <!-- Device Frame Mockup Container -->
+  <div class="device-container">
+    <div class="device-mockup" id="phone-device">
+      
+      <!-- React Bits: ClickSpark Interactive Canvas Overlay -->
+      <canvas id="click-spark-canvas" style="position: absolute; inset: 0; pointer-events: none; z-index: 9999; width: 100%; height: 100%;"></canvas>
+      
+      <!-- React Bits: Float-up XP Particle Container -->
+      <div id="floating-xp-container" style="position: absolute; inset: 0; pointer-events: none; z-index: 9998; overflow: hidden;"></div>
+      
+      <!-- React Bits: Heatmap Floating Tooltip -->
+      <div id="cal-cell-tooltip" class="cal-tooltip" style="display: none; opacity: 0;"></div>
+
+      <!-- ==============================================
+           SPLASH / INTRO (nằm trong khung điện thoại)
+           ============================================== -->
+      <div class="ht-splash play" id="ht-splash" role="img" aria-label="Habit Tracker – chạm để bỏ qua">
+        <div class="sp-blob sp-b1"></div><div class="sp-blob sp-b2"></div>
+        <div class="sp-logo" id="ht-splash-logo">
+          <div class="sp-wave"></div><div class="sp-orbit"></div><div class="sp-badge"></div>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path class="sp-fill" d="M20 4C10 4 4 10 4 17c0 2 1 3 3 3 7 0 13-6 13-16z"/>
+            <path class="sp-stroke" pathLength="1" d="M20 4C10 4 4 10 4 17c0 2 1 3 3 3 7 0 13-6 13-16z"/>
+            <path class="sp-stroke" pathLength="1" d="M4 20L14 10"/>
+          </svg>
+        </div>
+        <h1 class="sp-title" id="ht-splash-title" aria-label="Habit Tracker">Habit Tracker</h1>
+        <p class="sp-tag">A little better, every day.</p>
+        <div class="sp-bar"><b></b></div>
+      </div>
+
+      <!-- iOS Status Bar & Dynamic Island -->
+      <div class="status-bar">
+        <span id="live-clock">09:41</span>
+        <div class="dynamic-island" id="dynamic-island">
+          <div class="island-camera"></div>
+        </div>
+        <div class="status-icons">
+          <span>5G</span>
+          <span>●●●</span>
+          <span>100%</span>
+        </div>
+      </div>
+
+      <!-- Toast Container -->
+      <div class="toast-container" id="toast-container"></div>
+
+      <!-- Scrollable App Screen Viewport -->
+      <div class="app-screen-viewport">
+
+        <!-- ==============================================
+             SCREEN 01: TODAY (HÔM NAY)
+             ============================================== -->
+        <section class="screen-view active" id="view-today">
+          <div class="app-header">
+            <div>
+              <p class="greeting-text" id="greeting-text">Good morning, Tân!</p>
+              <h1 class="screen-heading">Today's Habits</h1>
+            </div>
+            <div class="header-actions">
+              <button class="header-btn" title="Thông báo" onclick="showToast('🔔 Không có thông báo mới')">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                <span class="badge-dot"></span>
+              </button>
+              <button class="header-btn avatar-btn" title="Hồ sơ" onclick="switchTab('settings')">
+                <div style="width:100%; height:100%; background:#265344; color:white; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">T</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Hero Daily Progress Card (React Bits: Spotlight & 3D Tilt) -->
+          <div class="hero-progress-card spotlight-card tilted-card">
+            <div class="progress-card-top">
+              <span class="progress-label-pill shiny-pill-badge">DAILY PROGRESS</span>
+              <span class="progress-percent shiny-text" id="hero-percent">50%</span>
+            </div>
+            <h2 class="progress-headline" id="hero-headline">You're halfway there.</h2>
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill" id="hero-progress-bar" style="width: 50%;"></div>
+            </div>
+            <div class="progress-card-bottom">
+              <span id="hero-counter">2/4 Completed</span>
+              <span id="hero-support">Keep going, one step at a time!</span>
+            </div>
+          </div>
+
+          <!-- Summary Stat Cards (React Bits: Spotlight & 3D Tilt) -->
+          <div class="summary-grid">
+            <div class="stat-card spotlight-card tilted-card">
+              <div class="stat-icon streak">🔥</div>
+              <div class="stat-info">
+                <div class="stat-num" id="stat-streak">7 Days</div>
+                <div class="stat-label">Current Streak</div>
+              </div>
+            </div>
+            <div class="stat-card spotlight-card tilted-card">
+              <div class="stat-icon xp">⭐</div>
+              <div class="stat-info">
+                <div class="stat-num" id="stat-xp">1,250</div>
+                <div class="stat-label">Total XP</div>
+              </div>
+            </div>
+            <div class="stat-card spotlight-card tilted-card">
+              <div class="stat-icon goal">🎯</div>
+              <div class="stat-info">
+                <div class="stat-num" id="stat-goal">2/4</div>
+                <div class="stat-label">Daily Goal</div>
+              </div>
+            </div>
+            <div class="stat-card spotlight-card tilted-card">
+              <div class="stat-icon rate">📈</div>
+              <div class="stat-info">
+                <div class="stat-num" id="stat-rate">78%</div>
+                <div class="stat-label">Weekly Success</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daily Rituals Section -->
+          <div class="section-header">
+            <h3 class="section-title">Your daily rituals</h3>
+            <button class="btn-add-habit" onclick="openAddHabitModal()">
+              <span>+</span> Thêm mới
+            </button>
+          </div>
+
+          <!-- Habit List -->
+          <div class="habit-list" id="habits-container">
+            <!-- Dynamic Habits Rendered by JS -->
+          </div>
+
+          <!-- Streak Freeze & Motivational Quote Cards -->
+          <div class="feature-card freeze-card">
+            <div class="feature-icon-box">❄️</div>
+            <div class="feature-content">
+              <h4>Streak Freeze Protection</h4>
+              <p>Bạn còn <strong>2 lần bảo vệ</strong> streak nếu lỡ bận rộn 1 ngày!</p>
+            </div>
+          </div>
+
+          <div class="feature-card quote-card">
+            <div class="feature-icon-box">💡</div>
+            <div class="feature-content">
+              <h4>Small steps matter</h4>
+              <p>"Success is the sum of small efforts, repeated day in and day out."</p>
+            </div>
+          </div>
+
+          <div class="bottom-scroll-spacer"></div>
+        </section>
+
+        <!-- ==============================================
+             SCREEN 02: CALENDAR (LỊCH HOẠT ĐỘNG)
+             ============================================== -->
+        <section class="screen-view" id="view-calendar">
+          <div class="app-header">
+            <div>
+              <p class="greeting-text">Lịch nhất quán</p>
+              <h1 class="screen-heading">Activity Calendar</h1>
+            </div>
+          </div>
+
+          <!-- Sliding Segmented Bar: Ô select đen chạy theo -->
+          <div class="sliding-segmented-bar" id="cal-mode-segmented">
+            <div class="sliding-indicator-pill" id="cal-mode-pill" style="width: calc(50% - 4px); transform: translateX(0px);"></div>
+            <button class="segment-tab-btn active" id="btn-cal-month-view" onclick="setCalendarMode('month', this)">Theo Tháng</button>
+            <button class="segment-tab-btn" id="btn-cal-week-view" onclick="setCalendarMode('week', this)">Theo Tuần</button>
+          </div>
+
+          <div class="calendar-card spotlight-card tilted-card">
+            <div class="cal-header">
+              <div style="display:flex; align-items:center; gap:4px;">
+                <button class="cal-nav-month-btn" onclick="changeMonth(-1)" title="Tháng trước">«</button>
+                <button class="cal-nav-btn" id="btn-cal-prev" onclick="navigateCalendar(-1)" title="Ngày trước / Lùi">&lt;</button>
+              </div>
+              <div class="cal-title-wrap" style="text-align: center; display:flex; flex-direction:column; align-items:center; gap:2px;">
+                <div class="cal-title" id="cal-month-title" onclick="changeMonth(1)" title="Bấm để chuyển sang tháng sau" style="cursor: pointer; user-select: none;">Tháng 11, 2026</div>
+                <button type="button" class="cal-today-badge-btn" onclick="jumpToToday()" title="Quay về ngày hôm nay">Hôm nay</button>
+              </div>
+              <div style="display:flex; align-items:center; gap:4px;">
+                <button class="cal-nav-btn" id="btn-cal-next" onclick="navigateCalendar(1)" title="Ngày tiếp theo (Next)">&gt;</button>
+                <button class="cal-nav-month-btn" onclick="changeMonth(1)" title="Tháng sau">»</button>
+              </div>
+            </div>
+            <div class="cal-weekdays">
+              <span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span>
+            </div>
+            <div class="cal-grid" id="cal-grid">
+              <!-- Calendar days rendered by JS -->
+            </div>
+            <div class="cal-legend">
+              <span>Ít</span>
+              <div class="legend-box" style="background: #F1F5F2;"></div>
+              <div class="legend-box" style="background: #D1E7DA;"></div>
+              <div class="legend-box" style="background: #A8D5BA;"></div>
+              <div class="legend-box" style="background: #60B788;"></div>
+              <div class="legend-box" style="background: #34765A;"></div>
+              <span>Nhiều</span>
+            </div>
+          </div>
+
+          <!-- Selected Day Details Card (Changes content dynamically on day select) -->
+          <div class="day-detail-card spotlight-card tilted-card" id="cal-day-detail">
+            <div class="day-detail-header">
+              <div>
+                <span class="day-detail-date" id="cal-selected-date-label">Chủ nhật, 15 Tháng 11</span>
+                <div style="display:flex; gap:6px; margin-top:4px;">
+                  <button type="button" onclick="navigateCalendar(-1)" style="border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-sub); border-radius:12px; padding:2px 8px; font-size:11px; font-weight:600; cursor:pointer;">← Trước</button>
+                  <button type="button" onclick="navigateCalendar(1)" style="border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-sub); border-radius:12px; padding:2px 8px; font-size:11px; font-weight:600; cursor:pointer;">Sau →</button>
+                </div>
+              </div>
+              <div class="mood-selector">
+                <button class="mood-btn active" onclick="setDayMood('😄')" title="Tuyệt vời">😄</button>
+                <button class="mood-btn" onclick="setDayMood('😊')" title="Hài lòng">😊</button>
+                <button class="mood-btn" onclick="setDayMood('😐')" title="Bình thường">😐</button>
+                <button class="mood-btn" onclick="setDayMood('😴')" title="Mệt mỏi">😴</button>
+              </div>
+            </div>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px;" id="cal-selected-summary">Hoàn thành 4/4 thói quen hôm nay (100%).</p>
+            <div id="cal-day-habits-mini" style="display: flex; flex-direction: column; gap: 8px;">
+              <!-- Mini completed habits rendered by JS -->
+            </div>
+          </div>
+
+          <div class="summary-grid">
+            <div class="stat-card">
+              <div class="stat-icon goal">📅</div>
+              <div class="stat-info">
+                <div class="stat-num" id="cal-active-days">24 Ngày</div>
+                <div class="stat-label">Active Days</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon rate">🏆</div>
+              <div class="stat-info">
+                <div class="stat-num" id="cal-best-streak">15 Ngày</div>
+                <div class="stat-label">Best Streak</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bottom-scroll-spacer"></div>
+        </section>
+
+        <!-- ==============================================
+             SCREEN 03: STATS (THỐNG KÊ TỔNG HỢP TỪ THẤP LÊN CAO)
+             ============================================== -->
+        <section class="screen-view" id="view-stats">
+          <div class="app-header">
+            <div>
+              <p class="greeting-text">Tiến độ chi tiết</p>
+              <h1 class="screen-heading">Your Statistics</h1>
+            </div>
+          </div>
+
+          <!-- Sliding Segmented Bar: 7 - 30 - 90 Ngày với ô select đen chạy theo -->
+          <div class="sliding-segmented-bar" id="stats-segmented-bar">
+            <div class="sliding-indicator-pill" id="stats-pill" style="width: calc(33.333% - 4px); transform: translateX(0px);"></div>
+            <button class="segment-tab-btn active" onclick="switchStatsPeriod(7, 0, this)">7 Days</button>
+            <button class="segment-tab-btn" onclick="switchStatsPeriod(30, 1, this)">30 Days</button>
+            <button class="segment-tab-btn" onclick="switchStatsPeriod(90, 2, this)">90 Days</button>
+          </div>
+
+          <!-- Dynamic Aggregated Overview Cards -->
+          <div class="summary-grid">
+            <div class="stat-card spotlight-card tilted-card">
+              <div class="stat-icon rate">📊</div>
+              <div class="stat-info">
+                <div class="stat-num shiny-text" id="stats-overall-rate">78%</div>
+                <div class="stat-label">Completion Rate</div>
+              </div>
+            </div>
+            <div class="stat-card spotlight-card tilted-card">
+              <div class="stat-icon streak">🔥</div>
+              <div class="stat-info">
+                <div class="stat-num" id="stats-longest-streak">7 Days</div>
+                <div class="stat-label">Longest Streak</div>
+              </div>
+            </div>
+            <div class="stat-card spotlight-card tilted-card">
+              <div class="stat-icon goal">✅</div>
+              <div class="stat-info">
+                <div class="stat-num" id="stats-total-completed">22</div>
+                <div class="stat-label">Total Completed</div>
+              </div>
+            </div>
+            <div class="stat-card spotlight-card tilted-card">
+              <div class="stat-icon xp">🏆</div>
+              <div class="stat-info">
+                <div class="stat-num" id="stats-best-habit">Đọc sách</div>
+                <div class="stat-label">Best Habit</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Period Summary Card -->
+          <div class="stats-summary-box spotlight-card" id="stats-period-summary" style="display: none;">
+            <span style="font-size: 18px;">💡</span>
+            <div>
+              <strong id="stats-summary-title">7 ngày qua:</strong>
+              <span id="stats-summary-desc">Đọc sách là thói quen nổi bật nhất với 7/7 ngày hoàn thành tuyệt đối (100%).</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Chart Card -->
+          <div class="chart-card spotlight-card">
+            <div class="chart-header">
+              <h3 class="section-title" id="chart-section-title">Completion Trends (7 Days)</h3>
+              <span id="chart-avg-badge" class="shiny-pill-badge" style="font-size: 12px; font-weight:700; color: var(--accent); background: var(--accent-soft); padding: 4px 10px; border-radius: 12px; border: 1px solid var(--accent-border);">Avg: 78%</span>
+            </div>
+            <div class="bar-chart-container" id="bar-chart-bars">
+              <!-- Rendered dynamically by JS -->
+            </div>
+            <div class="chart-labels" id="bar-chart-labels">
+              <!-- Rendered dynamically by JS -->
+            </div>
+          </div>
+
+          <!-- Habit Performance Breakdown -->
+          <div class="chart-card spotlight-card">
+            <h3 class="section-title" style="margin-bottom: 12px;">Habit Performance Breakdown</h3>
+            <div id="perf-list">
+              <!-- Rendered dynamically by JS -->
+            </div>
+          </div>
+
+          <div class="bottom-scroll-spacer"></div>
+        </section>
+
+        <!-- ==============================================
+             SCREEN 04: BADGES (HUY HIỆU & THÀNH TÍCH)
+             ============================================== -->
+        <section class="screen-view" id="view-badges">
+          <div class="app-header">
+            <div>
+              <p class="greeting-text">Gamification & Quà thưởng</p>
+              <h1 class="screen-heading">Achievements</h1>
+            </div>
+          </div>
+
+          <!-- Level Hero Card (React Bits: Spotlight & 3D Tilt) -->
+          <div class="level-hero-card spotlight-card tilted-card">
+            <div class="level-top">
+              <div class="level-badge-avatar">🎖️</div>
+              <div class="level-info-col">
+                <div class="level-name shiny-text">Level 5 · Habit Builder</div>
+                <div class="level-sub">1,250 XP / 1,500 XP to Level 6</div>
+              </div>
+            </div>
+            <div class="progress-bar-track" style="background: rgba(255,255,255,0.15);">
+              <div class="progress-bar-fill" style="width: 83%; background: linear-gradient(90deg, #F59E0B, #FBBF24);"></div>
+            </div>
+            <p style="font-size: 12px; color: #CBD5E1; margin-top: 8px;">Chỉ cần thêm 250 XP nữa để mở khóa cấp độ Tiếp theo!</p>
+          </div>
+
+          <!-- Badges Grid -->
+          <div class="section-header">
+            <h3 class="section-title">Huy hiệu thành tích (8)</h3>
+          </div>
+          <div class="badge-grid" id="badge-grid-container">
+            <!-- Rendered by JS -->
+          </div>
+
+          <div class="bottom-scroll-spacer"></div>
+        </section>
+
+        <!-- ==============================================
+             SCREEN 05: SETTINGS (CÀI ĐẶT)
+             ============================================== -->
+        <section class="screen-view" id="view-settings">
+          <div class="app-header">
+            <div>
+              <p class="greeting-text">Tùy biến ứng dụng</p>
+              <h1 class="screen-heading">Settings</h1>
+            </div>
+          </div>
+
+          <!-- Profile -->
+          <div class="profile-card">
+            <div class="profile-avatar-large">T</div>
+            <div class="profile-info">
+              <h3>Tân Hồ</h3>
+              <p>tan.ho@example.com</p>
+              <button class="btn-edit-profile" onclick="showToast('Chỉnh sửa hồ sơ')">Chỉnh sửa</button>
+            </div>
+          </div>
+
+          <!-- Appearance -->
+          <div class="settings-group">
+            <div class="settings-item">
+              <div class="settings-item-left">
+                <span style="font-size: 18px;">🌙</span>
+                <div>
+                  <div class="settings-item-title">Chế độ tối (Dark Mode)</div>
+                  <div class="settings-item-desc">Giảm mỏi mắt vào ban đêm</div>
+                </div>
+              </div>
+              <label class="switch-toggle">
+                <input type="checkbox" id="switch-dark-mode" onchange="toggleDarkMode(this.checked)">
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <!-- Stacked Accent Color row to prevent text squishing -->
+            <div class="settings-item-stacked">
+              <div class="settings-item-left">
+                <span style="font-size: 18px;">🎨</span>
+                <div>
+                  <div class="settings-item-title">Màu chủ đạo ứng dụng</div>
+                  <div class="settings-item-desc">Chọn tông màu phong cách bạn thích nhất</div>
+                </div>
+              </div>
+              <div class="accent-palette-row">
+                <div class="palette-circle active" style="background:#34765A;" onclick="setAppAccent('forest', this)" title="Forest Green"></div>
+                <div class="palette-circle" style="background:#10B981;" onclick="setAppAccent('emerald', this)" title="Emerald"></div>
+                <div class="palette-circle" style="background:#0D9488;" onclick="setAppAccent('teal', this)" title="Teal"></div>
+                <div class="palette-circle" style="background:#2563EB;" onclick="setAppAccent('ocean', this)" title="Ocean Blue"></div>
+                <div class="palette-circle" style="background:#EA580C;" onclick="setAppAccent('coral', this)" title="Coral"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Habit Preferences -->
+          <div class="settings-group">
+            <div class="settings-item">
+              <div class="settings-item-left">
+                <span style="font-size: 18px;">🔔</span>
+                <div>
+                  <div class="settings-item-title">Nhắc nhở hằng ngày</div>
+                  <div class="settings-item-desc">Nhận thông báo lúc 08:00 sáng</div>
+                </div>
+              </div>
+              <label class="switch-toggle">
+                <input type="checkbox" checked onchange="showToast('Đã lưu tùy chọn thông báo')">
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+            <div class="settings-item">
+              <div class="settings-item-left">
+                <span style="font-size: 18px;">🔊</span>
+                <div>
+                  <div class="settings-item-title">Âm thanh chúc mừng</div>
+                  <div class="settings-item-desc">Phát hiệu ứng âm thanh khi hoàn thành</div>
+                </div>
+              </div>
+              <label class="switch-toggle">
+                <input type="checkbox" id="switch-sound" checked onchange="toggleSound(this.checked)">
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Data Management -->
+          <div class="settings-group">
+            <div class="settings-item" style="cursor: pointer;" onclick="confirmResetData()">
+              <div class="settings-item-left">
+                <span style="font-size: 18px;">🗑️</span>
+                <div>
+                  <div class="settings-item-title" style="color: var(--danger);">Đặt lại toàn bộ dữ liệu</div>
+                  <div class="settings-item-desc">Xóa các thay đổi và tải lại dữ liệu mẫu</div>
+                </div>
+              </div>
+              <span style="font-size: 16px; color: var(--danger); font-weight:700;">&gt;</span>
+            </div>
+          </div>
+
+          <div style="text-align: center; font-size: 11px; color: var(--text-sub); margin-top: 10px;">
+            Habit Tracker v1.2.0 · Vibecoding UX Prototype<br>Designed for mobile experience
+          </div>
+
+          <div class="bottom-scroll-spacer"></div>
+        </section>
+
+      </div> <!-- /app-screen-viewport -->
+
+      <!-- Bottom Navigation Bar -->
+      <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('today')" id="tab-today">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Hôm nay</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('calendar')" id="tab-calendar">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span>Lịch</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('stats')" id="tab-stats">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          <span>Thống kê</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('badges')" id="tab-badges">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+          <span>Huy hiệu</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('settings')" id="tab-settings">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <span>Cài đặt</span>
+        </button>
+      </nav>
+
+      <!-- Bottom Home Indicator -->
+      <div class="home-indicator"></div>
+
+      <!-- ==============================================
+           MODAL: ADD NEW HABIT
+           ============================================== -->
+      <div class="modal-backdrop" id="modal-add-habit">
+        <div class="modal-sheet">
+          <div class="modal-drag-pill"></div>
+          <h2 class="modal-title" id="habit-modal-title">Tạo thói quen mới</h2>
+
+          <div class="form-group">
+            <label class="form-label">Tên thói quen</label>
+            <input type="text" class="form-input" id="input-habit-name" placeholder="Ví dụ: Thiền 10 phút, Học tiếng Anh...">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mô tả hoặc mục tiêu</label>
+            <input type="text" class="form-input" id="input-habit-desc" placeholder="Ví dụ: Giữ tâm trí bình an, 1 bài học Duolingo...">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Số lượng mục tiêu mỗi ngày <span style="font-weight:500; color:var(--text-sub);">(tùy chọn)</span></label>
+            <div class="form-row">
+              <input type="number" inputmode="numeric" min="1" max="999" step="1" class="form-input qty-num" id="input-habit-target" placeholder="Ví dụ: 8">
+              <input type="text" class="form-input qty-unit" id="input-habit-unit" maxlength="16" placeholder="Đơn vị: ly, trang, km...">
+            </div>
+            <div class="form-hint">Nhập số để có bộ đếm +/- (như Uống nước). Để trống nếu chỉ cần tick hoàn thành.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Chọn biểu tượng</label>
+            <div class="icon-picker-grid" id="icon-picker">
+              <div class="icon-opt selected" onclick="selectHabitIcon(this, '💧')">💧</div>
+              <div class="icon-opt" onclick="selectHabitIcon(this, '📖')">📖</div>
+              <div class="icon-opt" onclick="selectHabitIcon(this, '🏃')">🏃</div>
+              <div class="icon-opt" onclick="selectHabitIcon(this, '🌙')">🌙</div>
+              <div class="icon-opt" onclick="selectHabitIcon(this, '🧘')">🧘</div>
+              <div class="icon-opt" onclick="selectHabitIcon(this, '🍎')">🍎</div>
+              <div class="icon-opt" onclick="selectHabitIcon(this, '💻')">💻</div>
+              <div class="icon-opt" onclick="selectHabitIcon(this, '🎯')">🎯</div>
+              <div class="icon-opt" onclick="selectHabitIcon(this, '🚴')">🚴</div>
+              <div class="icon-opt" onclick="selectHabitIcon(this, '✍️')">✍️</div>
+              <div class="icon-opt" onclick="selectHabitIcon(this, '🌿')">🌿</div>
+              <div class="icon-opt" onclick="selectHabitIcon(this, '☕')">☕</div>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn-modal-cancel" onclick="closeAddHabitModal()">Hủy</button>
+            <button class="btn-modal-save" id="btn-habit-save" onclick="saveHabit()">Lưu thói quen</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================================
+           MODAL: BADGE DETAIL
+           ============================================== -->
+      <div class="modal-backdrop" id="modal-badge-detail">
+        <div class="modal-sheet" style="text-align: center;">
+          <div class="modal-drag-pill"></div>
+          <div id="badge-detail-icon" style="font-size: 64px; margin-bottom: 12px;">🏆</div>
+          <h2 class="modal-title" id="badge-detail-title" style="margin-bottom: 6px;">Tên huy hiệu</h2>
+          <p id="badge-detail-desc" style="font-size: 13px; color: var(--text-sub); margin-bottom: 16px;">Mô tả yêu cầu để mở khóa huy hiệu này.</p>
+          <div id="badge-detail-status" style="display: inline-block; padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 12px; margin-bottom: 24px;">Đã mở khóa</div>
+          <button class="btn-modal-save" style="width: 100%;" onclick="closeBadgeDetail()">Đóng</button>
+        </div>
+      </div>
+
+    </div> <!-- /device-mockup -->
+  </div> <!-- /device-container -->
+
+  <!-- ==============================================
+       JAVASCRIPT LOGIC & INTERACTIONS
+       ============================================== -->
+  <script>
+    /* Default initial habits */
+    const DEFAULT_HABITS = [
+      {
+        id: 'habit-1',
+        name: 'Drink Water',
+        desc: 'Stay hydrated',
+        icon: '💧',
+        streak: 7,
+        completed: false,
+        type: 'quantity',
+        current: 5,
+        target: 8,
+        unit: 'glasses'
+      },
+      {
+        id: 'habit-2',
+        name: 'Read a Book',
+        desc: '10 minutes of discovery',
+        icon: '📖',
+        streak: 5,
+        completed: true,
+        type: 'simple'
+      },
+      {
+        id: 'habit-3',
+        name: 'Morning Run',
+        desc: 'Move your body · 3 km',
+        icon: '🏃',
+        streak: 3,
+        completed: true,
+        type: 'simple'
+      },
+      {
+        id: 'habit-4',
+        name: 'Sleep Early',
+        desc: 'Wind down by 10:30 PM',
+        icon: '🌙',
+        streak: 2,
+        completed: false,
+        type: 'simple'
+      }
+    ];
+
+    const DEFAULT_BADGES = [
+      { id: 'b1', name: 'First Day', desc: 'Bắt đầu hành trình với thói quen đầu tiên', icon: '🌱', unlocked: true, date: '10/11/2026' },
+      { id: 'b2', name: '3-Day Streak', desc: 'Duy trì liên tục trong 3 ngày', icon: '🔥', unlocked: true, date: '12/11/2026' },
+      { id: 'b3', name: '7-Day Streak', desc: 'Hoàn thành thói quen 7 ngày liền', icon: '⚡', unlocked: true, date: '15/11/2026' },
+      { id: 'b4', name: 'Perfect Week', desc: 'Đạt 100% mục tiêu trong một tuần', icon: '⭐', unlocked: true, date: '14/11/2026' },
+      { id: 'b5', name: '30-Day Streak', desc: '30 ngày bền bỉ xây dựng thói quen mới', icon: '👑', unlocked: false, date: null },
+      { id: 'b6', name: 'Early Bird', desc: 'Hoàn thành thói quen trước 8:00 sáng', icon: '🌅', unlocked: true, date: '13/11/2026' },
+      { id: 'b7', name: 'Book Lover', desc: 'Đọc sách đều đặn liên tiếp 14 ngày', icon: '📚', unlocked: true, date: '15/11/2026' },
+      { id: 'b8', name: 'Water Master', desc: 'Uống đủ 8 ly nước trong 10 ngày', icon: '🌊', unlocked: false, date: null }
+    ];
+
+    /* Dynamic Aggregated Stats Dataset: 7 vs 30 vs 90 days (From Low to High) */
+    const STATS_DATA = {
+      7: {
+        overallRate: 78,
+        longestStreak: '7 Days',
+        totalCompleted: 22,
+        bestHabit: 'Đọc sách (100%)',
+        avgRate: '78%',
+        summaryTitle: '7 ngày gần nhất:',
+        summaryDesc: 'Đọc sách là thói quen duy trì tốt nhất với 7/7 ngày hoàn thành trọn vẹn (100%).',
+        chartTitle: 'Completion Trends (7 Days)',
+        bars: [
+          { label: 'T2', rate: 75, isToday: false },
+          { label: 'T3', rate: 100, isToday: false },
+          { label: 'T4', rate: 50, isToday: false },
+          { label: 'T5', rate: 75, isToday: false },
+          { label: 'T6', rate: 100, isToday: false },
+          { label: 'T7', rate: 80, isToday: false },
+          { label: 'CN', rate: 75, isToday: true }
+        ],
+        breakdown: [
+          { name: 'Đọc sách (Read a Book)', icon: '📖', rate: 100, text: '7/7 ngày' },
+          { name: 'Uống đủ nước (Drink Water)', icon: '💧', rate: 71, text: '5/7 ngày' },
+          { name: 'Chạy bộ (Morning Run)', icon: '🏃', rate: 57, text: '4/7 ngày' },
+          { name: 'Ngủ sớm (Sleep Early)', icon: '🌙', rate: 57, text: '4/7 ngày' }
+        ]
+      },
+      30: {
+        overallRate: 84,
+        longestStreak: '15 Days',
+        totalCompleted: 98,
+        bestHabit: 'Uống nước (90%)',
+        avgRate: '84%',
+        summaryTitle: '30 ngày tích lũy:',
+        summaryDesc: 'Tổng cộng 98 lần hoàn thành! Tỷ lệ kiên trì tăng từ 70% ở tuần 1 lên 95% ở tuần 4.',
+        chartTitle: 'Weekly Growth Trends (4 Weeks)',
+        bars: [
+          { label: 'Tuần 1', rate: 70, isToday: false },
+          { label: 'Tuần 2', rate: 80, isToday: false },
+          { label: 'Tuần 3', rate: 88, isToday: false },
+          { label: 'Tuần 4', rate: 95, isToday: true }
+        ],
+        breakdown: [
+          { name: 'Uống đủ nước (Drink Water)', icon: '💧', rate: 90, text: '27/30 ngày' },
+          { name: 'Đọc sách (Read a Book)', icon: '📖', rate: 87, text: '26/30 ngày' },
+          { name: 'Ngủ sớm (Sleep Early)', icon: '🌙', rate: 77, text: '23/30 ngày' },
+          { name: 'Chạy bộ (Morning Run)', icon: '🏃', rate: 73, text: '22/30 ngày' }
+        ]
+      },
+      90: {
+        overallRate: 89,
+        longestStreak: '28 Days',
+        totalCompleted: 312,
+        bestHabit: 'Chạy bộ (92%)',
+        avgRate: '89%',
+        summaryTitle: '90 ngày toàn diện:',
+        summaryDesc: 'Một hành trình phi thường với 312 lần hoàn thành! Thói quen đã trở thành lối sống tự nhiên của bạn.',
+        chartTitle: 'Quarterly Progression (3 Months)',
+        bars: [
+          { label: 'Tháng 9', rate: 76, isToday: false },
+          { label: 'Tháng 10', rate: 86, isToday: false },
+          { label: 'Tháng 11', rate: 96, isToday: true }
+        ],
+        breakdown: [
+          { name: 'Chạy bộ (Morning Run)', icon: '🏃', rate: 92, text: '83/90 ngày' },
+          { name: 'Uống đủ nước (Drink Water)', icon: '💧', rate: 91, text: '82/90 ngày' },
+          { name: 'Đọc sách (Read a Book)', icon: '📖', rate: 89, text: '80/90 ngày' },
+          { name: 'Ngủ sớm (Sleep Early)', icon: '🌙', rate: 82, text: '74/90 ngày' }
+        ]
+      }
+    };
+
+    // State Variables
+    let habits = JSON.parse(localStorage.getItem('ht_habits')) || DEFAULT_HABITS;
+    let badges = JSON.parse(localStorage.getItem('ht_badges')) || DEFAULT_BADGES;
+    let totalXP = parseInt(localStorage.getItem('ht_xp')) || 1250;
+    let soundEnabled = localStorage.getItem('ht_sound') !== 'false';
+    let selectedIcon = '💧';
+    let editingHabitId = null;
+    // Dọn phần "· 5/8 glasses" cũ trong mô tả của thói quen có số lượng (số lượng đã hiển thị ở bộ đếm)
+    habits.forEach(h => {
+      if (h.type === 'quantity' && h.desc) {
+        h.desc = h.desc.replace(/\s*·\s*\d+\s*\/\s*\d+[^·]*$/, '').trim();
+      }
+    });
+    let lastDeletedHabit = null;
+    // Ngày hôm nay (Today) thực tế
+    const todayDate = new Date();
+    const TODAY_DAY = todayDate.getDate();
+    const TODAY_MONTH = todayDate.getMonth();
+    const TODAY_YEAR = todayDate.getFullYear();
+
+    let currentCalMonth = TODAY_MONTH;
+    let currentCalYear = TODAY_YEAR;
+    let selectedDay = TODAY_DAY;
+    let currentStatsPeriod = 7;
+    let calendarViewMode = 'month'; // 'month' or 'week'
+
+    function persistState() {
+      localStorage.setItem('ht_habits', JSON.stringify(habits));
+      localStorage.setItem('ht_badges', JSON.stringify(badges));
+      localStorage.setItem('ht_xp', totalXP.toString());
+      localStorage.setItem('ht_sound', soundEnabled.toString());
+    }
+
+    // Audio Feedback using Web Audio API synthesis
+    function playChime(success = true) {
+      if (!soundEnabled) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        if (success) {
+          osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.15, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.3);
+        } else {
+          osc.frequency.setValueAtTime(320, ctx.currentTime);
+          gain.gain.setValueAtTime(0.1, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.15);
+        }
+      } catch (e) {}
+    }
+
+    // Confetti Burst Trigger with offline canvas fallback
+    function triggerCelebration() {
+      if (typeof confetti === 'function') {
+        try {
+          confetti({
+            particleCount: 70,
+            spread: 60,
+            origin: { y: 0.6 },
+            colors: ['#A8D5BA', '#34765A', '#6EE7B7', '#FBBF24']
+          });
+          return;
+        } catch(e) {}
+      }
+      
+      const colors = ['#A8D5BA', '#34765A', '#6EE7B7', '#FBBF24', '#EF4444'];
+      const device = document.getElementById('phone-device');
+      for (let i = 0; i < 35; i++) {
+        const p = document.createElement('div');
+        p.style.position = 'absolute';
+        p.style.width = (Math.random() * 8 + 6) + 'px';
+        p.style.height = (Math.random() * 8 + 6) + 'px';
+        p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        p.style.top = '45%';
+        p.style.left = '50%';
+        p.style.pointerEvents = 'none';
+        p.style.zIndex = '999';
+        p.style.transition = 'all 1s cubic-bezier(0.25, 1, 0.5, 1)';
+        device.appendChild(p);
+
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * 140 + 40;
+        const x = Math.cos(angle) * dist;
+        const y = Math.sin(angle) * dist - 30;
+
+        setTimeout(() => {
+          p.style.transform = `translate(${x}px, ${y}px) rotate(${Math.random() * 360}deg) scale(0)`;
+          p.style.opacity = '0';
+        }, 20);
+
+        setTimeout(() => p.remove(), 1100);
+      }
+    }
+
+    // Show dynamic Island Pulse notification
+    function pulseDynamicIsland(text) {
+      const island = document.getElementById('dynamic-island');
+      if (!island) return;
+      island.style.width = '190px';
+      island.innerHTML = `<span style="font-size:10px; color:#A8D5BA; font-weight:700; margin-right:8px; white-space:nowrap;">${text}</span><div class="island-camera"></div>`;
+      setTimeout(() => {
+        island.style.width = '115px';
+        island.innerHTML = `<div class="island-camera"></div>`;
+      }, 2200);
+    }
+
+    // Toast Notifications with optional Undo
+    function showToast(message, allowUndo = false) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast-msg';
+      toast.innerHTML = `<span>${message}</span>`;
+      
+      if (allowUndo) {
+        const undoBtn = document.createElement('button');
+        undoBtn.className = 'toast-undo-btn';
+        undoBtn.innerText = 'Hoàn tác';
+        undoBtn.onclick = () => {
+          undoLastAction();
+          toast.remove();
+        };
+        toast.appendChild(undoBtn);
+      }
+      
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.add('show'), 10);
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 350);
+      }, 3500);
+    }
+
+    // Toggle Habit Status
+    function toggleHabit(id, e) {
+      const h = habits.find(item => item.id === id);
+      if (!h) return;
+      
+      h.completed = !h.completed;
+      if (h.type === 'quantity') {
+        h.current = h.completed ? h.target : 0;
+      }
+      
+      if (h.completed) {
+        totalXP += 25;
+        playChime(true);
+        pulseDynamicIsland('+25 XP ⭐');
+        // React Bits: Float XP bubble at click position
+        const btn = document.querySelector(`[data-habit-id="${id}"] .btn-check-habit`)
+                 || (e?.target?.closest('.habit-card'));
+        spawnFloatXP(btn || e?.target, '+25 XP ⭐');
+        // React Bits: ClickSpark burst
+        if (e) triggerClickSpark(e.clientX, e.clientY, '#6EE7B7');
+      } else {
+        totalXP = Math.max(0, totalXP - 25);
+        playChime(false);
+      }
+      
+      persistState();
+      renderHabits();
+      updateHeroProgress();
+      renderStats();
+      renderCalendar();
+    }
+
+    // Modify quantity for countable habits
+    function adjustQuantity(id, delta, event) {
+      if (event) event.stopPropagation();
+      const h = habits.find(item => item.id === id);
+      if (!h || h.type !== 'quantity') return;
+      
+      h.current = Math.max(0, Math.min(h.target, h.current + delta));
+      h.completed = (h.current >= h.target);
+      
+      if (h.completed) {
+        totalXP += 25;
+        playChime(true);
+        pulseDynamicIsland(`Đạt mục tiêu ${h.name}! ${h.icon}`);
+        triggerCelebration();
+      }
+      
+      persistState();
+      renderHabits();
+      updateHeroProgress();
+      renderCalendar();
+    }
+
+    // Delete Habit with undo
+    function deleteHabit(id, event) {
+      if (event) event.stopPropagation();
+      const idx = habits.findIndex(item => item.id === id);
+      if (idx === -1) return;
+      
+      lastDeletedHabit = { item: habits[idx], index: idx };
+      habits.splice(idx, 1);
+      persistState();
+      renderHabits();
+      updateHeroProgress();
+      renderCalendar();
+      showToast('Đã xóa thói quen', true);
+    }
+
+    function undoLastAction() {
+      if (!lastDeletedHabit) return;
+      habits.splice(lastDeletedHabit.index, 0, lastDeletedHabit.item);
+      lastDeletedHabit = null;
+      persistState();
+      renderHabits();
+      updateHeroProgress();
+      renderCalendar();
+      showToast('Đã hoàn tác');
+    }
+
+    // Render Habits List (Structured without overlaps)
+    function renderHabits() {
+      const container = document.getElementById('habits-container');
+      if (!container) return;
+      
+      container.innerHTML = '';
+      habits.forEach((h, idx) => {
+        const card = document.createElement('div');
+        card.className = `habit-card spotlight-card ${h.completed ? 'completed' : ''}`;
+        card.setAttribute('data-habit-id', h.id);
+        
+        let quantityHtml = '';
+        if (h.type === 'quantity') {
+          quantityHtml = `
+            <div class="quantity-control">
+              <button class="btn-qty" onclick="adjustQuantity('${h.id}', -1, event)">-</button>
+              <span style="font-size:12px; font-weight:700;">${h.current}/${h.target} ${h.unit || ''}</span>
+              <button class="btn-qty" onclick="adjustQuantity('${h.id}', 1, event)">+</button>
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="habit-left" onclick="toggleHabit('${h.id}', event)">
+            <div class="habit-icon-box">${h.icon}</div>
+            <div class="habit-details">
+              <div class="habit-title">${h.name}</div>
+              <div class="habit-subtext">${h.desc}</div>
+              <div class="habit-streak-badge">🔥 ${h.streak}d streak</div>
+              ${quantityHtml}
+            </div>
+          </div>
+          <div class="habit-actions-right">
+            <button class="btn-check-habit" onclick="toggleHabit('${h.id}', event)" title="${h.completed ? 'Bỏ chọn' : 'Hoàn thành'}">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </button>
+            <button class="btn-habit-edit" onclick="openEditHabitModal('${h.id}', event)" title="Chỉnh sửa thói quen">
+              <svg width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            </button>
+            <button class="btn-habit-delete" onclick="deleteHabit('${h.id}', event)" title="Xóa thói quen">
+              <svg width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
+        `;
+        // Stagger entrance animation per card
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(14px)';
+        container.appendChild(card);
+        setTimeout(() => {
+          card.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1)';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, idx * 60 + 20);
+      });
+      // Re-init spotlight on new cards
+      setTimeout(() => { initSpotlightCards(); }, 100);
+    }
+
+    // Update Hero Progress Card & Stats
+    function updateHeroProgress() {
+      const total = habits.length;
+      const completed = habits.filter(h => h.completed).length;
+      const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+      
+      const percentEl = document.getElementById('hero-percent');
+      const headlineEl = document.getElementById('hero-headline');
+      const barEl = document.getElementById('hero-progress-bar');
+      const counterEl = document.getElementById('hero-counter');
+      const supportEl = document.getElementById('hero-support');
+      
+      // Animated counter for percent
+      if (percentEl) {
+        const fromPct = parseInt(percentEl.getAttribute('data-pct') || '0', 10);
+        percentEl.setAttribute('data-pct', percent);
+        if (fromPct !== percent) {
+          let start = null;
+          const duration = 500;
+          const step = (ts) => {
+            if (!start) start = ts;
+            const prog = Math.min((ts - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - prog, 3);
+            percentEl.innerText = `${Math.round(fromPct + (percent - fromPct) * eased)}%`;
+            if (prog < 1) requestAnimationFrame(step);
+            else percentEl.innerText = `${percent}%`;
+          };
+          requestAnimationFrame(step);
+        } else {
+          percentEl.innerText = `${percent}%`;
+        }
+      }
+      if (barEl) { barEl.style.transition = 'width 0.55s cubic-bezier(0.16,1,0.3,1)'; barEl.style.width = `${percent}%`; }
+      if (counterEl) counterEl.innerText = `${completed}/${total} Completed`;
+      
+      const goalEl = document.getElementById('stat-goal');
+      if (goalEl) goalEl.innerText = `${completed}/${total}`;
+      
+      const xpEl = document.getElementById('stat-xp');
+      if (xpEl) xpEl.innerText = totalXP.toLocaleString();
+
+      if (percent === 100 && total > 0) {
+        headlineEl.innerText = "All done! Amazing job! 🎉";
+        supportEl.innerText = "You achieved all goals for today!";
+        triggerCelebration();
+      } else if (percent >= 50) {
+        headlineEl.innerText = "You're halfway there.";
+        supportEl.innerText = "Keep going, one small step at a time!";
+      } else {
+        headlineEl.innerText = "A fresh start today.";
+        supportEl.innerText = "Every journey begins with a single step.";
+      }
+    }
+
+    /* =========================================
+       CALENDAR INTERACTIONS WITH ANIMATED PILL
+       ========================================= */
+    // Đặt ô đen trượt đúng bằng vị trí + kích thước của nút đang chọn
+    function movePillToButton(pill, btn) {
+      if (!pill || !btn || !btn.offsetWidth) return;
+      // pill có left: 4px nên trừ 4px; offsetLeft của nút đã tính theo thanh (position: relative)
+      pill.style.width = btn.offsetWidth + 'px';
+      pill.style.transform = `translateX(${btn.offsetLeft - 4}px)`;
+    }
+
+    function syncSegmentedPills() {
+      movePillToButton(document.getElementById('cal-mode-pill'),
+        document.querySelector('#cal-mode-segmented .segment-tab-btn.active'));
+      movePillToButton(document.getElementById('stats-pill'),
+        document.querySelector('#stats-segmented-bar .segment-tab-btn.active'));
+    }
+    window.addEventListener('resize', syncSegmentedPills);
+
+    function setCalendarMode(mode, btn) {
+      calendarViewMode = mode;
+      const pill = document.getElementById('cal-mode-pill');
+      
+      document.querySelectorAll('#cal-mode-segmented .segment-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      btn.blur();
+      
+      movePillToButton(pill, btn);
+      
+      renderCalendar();
+      showToast(`Đã chuyển chế độ xem: ${mode === 'month' ? 'Theo Tháng' : 'Theo Tuần'}`);
+    }
+
+    function getDaysInMonth(year, month) {
+      return new Date(year, month + 1, 0).getDate();
+    }
+
+    function getStartDayOffset(year, month) {
+      // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+      // Monday-first grid: T2 = 0, T3 = 1, T4 = 2, T5 = 3, T6 = 4, T7 = 5, CN = 6
+      const dayOfWeek = new Date(year, month, 1).getDay();
+      return (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
+    }
+
+    function getTodayHabitsProgress() {
+      const total = habits.length;
+      if (total === 0) return { completed: 0, total: 0, ratio: 0, level: 0 };
+      const completed = habits.filter(h => h.completed).length;
+      const ratio = completed / total;
+      
+      let level = 0;
+      if (completed === 0) {
+        level = 0; // Chưa làm thói quen nào: level 0 (xám)
+      } else if (ratio <= 0.25) {
+        level = 1; // 1 thói quen (25%): level 1 (xanh nhạt)
+      } else if (ratio <= 0.5) {
+        level = 2; // 2 thói quen (50%): level 2 (xanh vừa)
+      } else if (ratio < 1) {
+        level = 3; // 3 thói quen (75%): level 3 (xanh tươi)
+      } else {
+        level = 4; // Hoàn thành 100%: level 4 (xanh đậm nhất)
+      }
+      return { completed, total, ratio, level };
+    }
+
+    function getDayHeatmapLevel(year, month, day) {
+      // 1. Ngày hôm nay: Tự động đổi màu trực tiếp theo số nhiệm vụ hoàn thành trong tab Hôm nay!
+      if (year === TODAY_YEAR && month === TODAY_MONTH && day === TODAY_DAY) {
+        return getTodayHabitsProgress().level;
+      }
+
+      // 2. Các ngày tương lai (sau ngày hôm nay): Chưa diễn ra -> Level 0 (xám)
+      if (year > TODAY_YEAR || 
+         (year === TODAY_YEAR && month > TODAY_MONTH) || 
+         (year === TODAY_YEAR && month === TODAY_MONTH && day > TODAY_DAY)) {
+        return 0;
+      }
+
+      // 3. Các ngày trong quá khứ của tháng hiện tại:
+      if (year === TODAY_YEAR && month === TODAY_MONTH) {
+        const diff = TODAY_DAY - day;
+        if (diff >= 1 && diff <= 7) {
+          return (day % 3 === 0) ? 4 : (day % 2 === 0) ? 3 : 2;
+        }
+        return (day % 4 === 0) ? 3 : (day % 3 === 0) ? 2 : 1;
+      }
+
+      // 4. Các tháng khác (ví dụ Tháng 12/2026 khi xem trong demo):
+      const pseudo = (day * 7 + month * 13 + year) % 10;
+      if (pseudo < 2) return 1;
+      if (pseudo < 5) return 2;
+      if (pseudo < 8) return 3;
+      return 4;
+    }
+
+    function jumpToToday() {
+      currentCalMonth = TODAY_MONTH;
+      currentCalYear = TODAY_YEAR;
+      selectedDay = TODAY_DAY;
+      renderCalendar();
+      showToast('Đã về ngày hôm nay! 📅');
+    }
+
+    function renderCalendar() {
+      const grid = document.getElementById('cal-grid');
+      const monthTitle = document.getElementById('cal-month-title');
+      if (!grid) return;
+      
+      grid.innerHTML = '';
+      const months = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+      monthTitle.innerText = `${months[currentCalMonth]}, ${currentCalYear}`;
+      
+      const daysCount = getDaysInMonth(currentCalYear, currentCalMonth);
+      if (selectedDay > daysCount) selectedDay = daysCount;
+      if (selectedDay < 1) selectedDay = 1;
+
+      let cellIndex = 0;
+
+      function appendCell(cell, isEmpty) {
+        if (!isEmpty) {
+          cell.style.opacity = '0';
+          cell.style.transform = 'scale(0.7)';
+          const delay = cellIndex * 18;
+          cellIndex++;
+          grid.appendChild(cell);
+          setTimeout(() => {
+            cell.style.transition = 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.34,1.56,0.64,1)';
+            cell.style.opacity = '1';
+            cell.style.transform = 'scale(1)';
+          }, delay);
+        } else {
+          grid.appendChild(cell);
+        }
+      }
+
+      if (calendarViewMode === 'week') {
+        // Week view: Show days around selectedDay or current week
+        const startDay = Math.max(1, Math.min(selectedDay - 3, daysCount - 6));
+        const endDay = Math.min(daysCount, startDay + 6);
+        for (let d = startDay; d <= endDay; d++) {
+          const cell = document.createElement('div');
+          const level = getDayHeatmapLevel(currentCalYear, currentCalMonth, d);
+          const isToday = (currentCalYear === TODAY_YEAR && currentCalMonth === TODAY_MONTH && d === TODAY_DAY);
+          cell.className = `cal-day level-${level} ${d === selectedDay ? 'selected' : ''} ${isToday ? 'is-today' : ''}`;
+          cell.setAttribute('data-day', d);
+          cell.innerText = d;
+          if (isToday) cell.title = `Hôm nay (Ngày ${d})`;
+          cell.onclick = () => selectCalDay(d);
+          appendCell(cell, false);
+        }
+      } else {
+        // Month view: Real dynamic start day offset
+        const startDayOffset = getStartDayOffset(currentCalYear, currentCalMonth);
+        
+        for (let i = 0; i < startDayOffset; i++) {
+          const emptyCell = document.createElement('div');
+          emptyCell.className = 'cal-day empty';
+          appendCell(emptyCell, true);
+        }
+        
+        for (let d = 1; d <= daysCount; d++) {
+          const cell = document.createElement('div');
+          const level = getDayHeatmapLevel(currentCalYear, currentCalMonth, d);
+          const isToday = (currentCalYear === TODAY_YEAR && currentCalMonth === TODAY_MONTH && d === TODAY_DAY);
+          
+          cell.className = `cal-day level-${level} ${d === selectedDay ? 'selected' : ''} ${isToday ? 'is-today' : ''}`;
+          cell.setAttribute('data-day', d);
+          cell.innerText = d;
+          if (isToday) cell.title = `Hôm nay (Ngày ${d})`;
+          cell.onclick = () => selectCalDay(d);
+          appendCell(cell, false);
+        }
+      }
+      
+      updateDayDetailContent(selectedDay);
+      // Re-init tooltip after render
+      setTimeout(() => initCalendarTooltip(), daysCount * 18 + 50);
+    }
+
+    function selectCalDay(day) {
+      const daysCount = getDaysInMonth(currentCalYear, currentCalMonth);
+      if (day < 1) day = 1;
+      if (day > daysCount) day = daysCount;
+      selectedDay = day;
+
+      document.querySelectorAll('#cal-grid .cal-day:not(.empty)').forEach(el => {
+        const d = parseInt(el.getAttribute('data-day'), 10);
+        if (d === selectedDay) {
+          el.classList.add('selected');
+        } else {
+          el.classList.remove('selected');
+        }
+      });
+
+      updateDayDetailContent(selectedDay);
+    }
+
+    // Nút next / prev ngày: ô vuông viền di chuyển theo mượt mà
+    function navigateCalendar(direction) {
+      const daysCount = getDaysInMonth(currentCalYear, currentCalMonth);
+      let targetDay = selectedDay + direction;
+
+      if (calendarViewMode === 'week') {
+        if (targetDay > daysCount) {
+          changeMonth(1, 1);
+        } else if (targetDay < 1) {
+          changeMonth(-1, -1);
+        } else {
+          selectCalDay(targetDay);
+          renderCalendar();
+        }
+        return;
+      }
+
+      if (targetDay > daysCount) {
+        // Đi hết tháng -> chuyển sang ngày 1 tháng tiếp theo
+        changeMonth(1, 1);
+      } else if (targetDay < 1) {
+        // Lùi về trước ngày 1 -> chuyển về ngày cuối tháng trước
+        changeMonth(-1, -1);
+      } else {
+        selectCalDay(targetDay);
+      }
+    }
+
+    function changeMonth(direction, targetSelectedDay = null) {
+      currentCalMonth += direction;
+      if (currentCalMonth > 11) { 
+        currentCalMonth = 0; 
+        currentCalYear++; 
+      }
+      if (currentCalMonth < 0) { 
+        currentCalMonth = 11; 
+        currentCalYear--; 
+      }
+      
+      const newMonthDays = getDaysInMonth(currentCalYear, currentCalMonth);
+      if (targetSelectedDay === 1) {
+        selectedDay = 1;
+      } else if (targetSelectedDay === -1) {
+        selectedDay = newMonthDays;
+      } else if (selectedDay > newMonthDays) {
+        selectedDay = newMonthDays;
+      }
+      
+      renderCalendar();
+      showToast(`Lịch: Tháng ${currentCalMonth + 1}, ${currentCalYear}`);
+    }
+
+    // Hỗ trợ phím mũi tên Trái / Phải để di chuyển ô vuông viền lịch
+    document.addEventListener('keydown', (e) => {
+      const calView = document.getElementById('view-calendar');
+      if (calView && calView.classList.contains('active')) {
+        if (e.key === 'ArrowRight') {
+          navigateCalendar(1);
+        } else if (e.key === 'ArrowLeft') {
+          navigateCalendar(-1);
+        }
+      }
+    });
+
+    function updateDayDetailContent(day) {
+      const label = document.getElementById('cal-selected-date-label');
+      const summary = document.getElementById('cal-selected-summary');
+      const miniList = document.getElementById('cal-day-habits-mini');
+      if (!label || !summary || !miniList) return;
+
+      const dateObj = new Date(currentCalYear, currentCalMonth, day);
+      const dayNames = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+      const dayOfWeek = dayNames[dateObj.getDay()];
+      
+      const isToday = (currentCalYear === TODAY_YEAR && currentCalMonth === TODAY_MONTH && day === TODAY_DAY);
+
+      // Nếu đang ở chế độ xem Tuần (Week view), hiển thị tiêu đề và nội dung phù hợp với tuần
+      if (calendarViewMode === 'week') {
+        const daysCount = getDaysInMonth(currentCalYear, currentCalMonth);
+        const startDay = Math.max(1, Math.min(selectedDay - 3, daysCount - 6));
+        const endDay = Math.min(daysCount, startDay + 6);
+        
+        label.innerHTML = `
+          <div class="cal-week-badge-chip">📅 Chế độ xem Tuần (${startDay} - ${endDay} Thg ${currentCalMonth + 1})</div>
+          <div>${dayOfWeek}, ${day} Tháng ${currentCalMonth + 1}, ${currentCalYear}${isToday ? ' (Hôm nay)' : ''}</div>
+        `;
+        
+        // Tính tổng hợp số ngày hoàn thành tốt trong tuần hiện tại
+        let weekCompletedDays = 0;
+        for (let d = startDay; d <= endDay; d++) {
+          const lvl = getDayHeatmapLevel(currentCalYear, currentCalMonth, d);
+          if (lvl >= 2) weekCompletedDays++;
+        }
+        const weekRate = Math.round((weekCompletedDays / 7) * 100);
+
+        if (isToday) {
+          const { completed, total, ratio } = getTodayHabitsProgress();
+          const percent = total > 0 ? Math.round(ratio * 100) : 0;
+          summary.innerText = `Tuần này đạt ${weekRate}% mục tiêu · Hôm nay: ${completed}/${total} thói quen (${percent}%) ${percent === 100 ? '🎉' : '💪'}`;
+          miniList.innerHTML = habits.map(h => `
+            <div style="font-size:12px; font-weight:600; color:var(--text-main); background:var(--bg-app); padding:8px 12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+              <span>${h.icon} ${h.name}</span>
+              <span style="color:${h.completed ? '#059669' : 'var(--text-sub)'}; font-weight:700;">
+                ${h.completed ? '✓ Hoàn thành' : (h.type === 'quantity' ? `${h.current}/${h.target}` : 'Chưa xong')}
+              </span>
+            </div>
+          `).join('');
+          return;
+        }
+
+        const isFuture = (currentCalYear > TODAY_YEAR || 
+                         (currentCalYear === TODAY_YEAR && currentCalMonth > TODAY_MONTH) || 
+                         (currentCalYear === TODAY_YEAR && currentCalMonth === TODAY_MONTH && day > TODAY_DAY));
+        if (isFuture) {
+          summary.innerText = `Mục tiêu tuần: Duy trì đều đặn 4 thói quen mỗi ngày (Tuần này đang đạt ${weekRate}%).`;
+          miniList.innerHTML = `
+            <div style="font-size:12px; color:var(--text-sub); text-align:center; padding:12px;">
+              Ngày sắp tới trong tuần — Hãy giữ vững nhịp độ này nhé!
+            </div>
+          `;
+          return;
+        }
+
+        summary.innerText = `Trong tuần này: Ngày ${day} đã hoàn thành ${day % 2 === 0 ? '3/4' : '4/4'} thói quen · Tiến độ tuần: ${weekRate}%.`;
+        miniList.innerHTML = `
+          <div style="font-size:12px; font-weight:600; color:var(--text-main); background:var(--bg-app); padding:8px 12px; border-radius:10px; display:flex; justify-content:space-between;">
+            <span>💧 Uống đủ nước</span><span style="color:#059669; font-weight:700;">✓ Hoàn thành</span>
+          </div>
+          <div style="font-size:12px; font-weight:600; color:var(--text-main); background:var(--bg-app); padding:8px 12px; border-radius:10px; display:flex; justify-content:space-between;">
+            <span>📖 Đọc sách 10 phút</span><span style="color:#059669; font-weight:700;">✓ Hoàn thành</span>
+          </div>
+          <div style="font-size:12px; font-weight:600; color:var(--text-main); background:var(--bg-app); padding:8px 12px; border-radius:10px; display:flex; justify-content:space-between;">
+            <span>🏃 Chạy bộ 3 km</span><span style="color:#059669; font-weight:700;">✓ Hoàn thành</span>
+          </div>
+        `;
+        return;
+      }
+
+      // Chế độ xem Tháng (Month view)
+      label.innerText = `${dayOfWeek}, ${day} Tháng ${currentCalMonth + 1}, ${currentCalYear}${isToday ? ' (Hôm nay)' : ''}`;
+      
+      if (isToday) {
+        const { completed, total, ratio } = getTodayHabitsProgress();
+        const percent = total > 0 ? Math.round(ratio * 100) : 0;
+        summary.innerText = `Hôm nay: Đã hoàn thành ${completed}/${total} thói quen (${percent}%) ${percent === 100 ? '🎉 Xuất sắc!' : '💪'}`;
+        miniList.innerHTML = habits.map(h => `
+          <div style="font-size:12px; font-weight:600; color:var(--text-main); background:var(--bg-app); padding:8px 12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+            <span>${h.icon} ${h.name}</span>
+            <span style="color:${h.completed ? '#059669' : 'var(--text-sub)'}; font-weight:700;">
+              ${h.completed ? '✓ Hoàn thành' : (h.type === 'quantity' ? `${h.current}/${h.target}` : 'Chưa xong')}
+            </span>
+          </div>
+        `).join('');
+        return;
+      }
+
+      const isFuture = (currentCalYear > TODAY_YEAR || 
+                       (currentCalYear === TODAY_YEAR && currentCalMonth > TODAY_MONTH) || 
+                       (currentCalYear === TODAY_YEAR && currentCalMonth === TODAY_MONTH && day > TODAY_DAY));
+      if (isFuture) {
+        summary.innerText = "Ngày tương lai — Chưa có dữ liệu thói quen ghi nhận.";
+        miniList.innerHTML = `
+          <div style="font-size:12px; color:var(--text-sub); text-align:center; padding:12px;">
+            Hãy tiếp tục kiên trì cho các ngày tới!
+          </div>
+        `;
+      } else if (day % 2 === 0) {
+        const count = (day % 4 === 0) ? 3 : 2;
+        summary.innerText = `Đã hoàn thành ${count}/4 thói quen vào ngày này.`;
+        miniList.innerHTML = `
+          <div style="font-size:12px; font-weight:600; color:var(--text-main); background:var(--bg-app); padding:8px 12px; border-radius:10px; display:flex; justify-content:space-between;">
+            <span>💧 Uống đủ nước</span><span style="color:#059669; font-weight:700;">✓ Hoàn thành</span>
+          </div>
+          <div style="font-size:12px; font-weight:600; color:var(--text-main); background:var(--bg-app); padding:8px 12px; border-radius:10px; display:flex; justify-content:space-between;">
+            <span>📖 Đọc sách 10 phút</span><span style="color:#059669; font-weight:700;">✓ Hoàn thành</span>
+          </div>
+          ${count === 3 ? `
+          <div style="font-size:12px; font-weight:600; color:var(--text-main); background:var(--bg-app); padding:8px 12px; border-radius:10px; display:flex; justify-content:space-between;">
+            <span>🏃 Chạy bộ 3 km</span><span style="color:#059669; font-weight:700;">✓ Hoàn thành</span>
+          </div>` : ''}
+        `;
+      } else {
+        const count = 3;
+        summary.innerText = `Đã hoàn thành ${count}/4 thói quen vào ngày này.`;
+        miniList.innerHTML = `
+          <div style="font-size:12px; font-weight:600; color:var(--text-main); background:var(--bg-app); padding:8px 12px; border-radius:10px; display:flex; justify-content:space-between;">
+            <span>💧 Uống đủ nước</span><span style="color:#059669; font-weight:700;">✓ Hoàn thành</span>
+          </div>
+          <div style="font-size:12px; font-weight:600; color:var(--text-main); background:var(--bg-app); padding:8px 12px; border-radius:10px; display:flex; justify-content:space-between;">
+            <span>🌙 Ngủ sớm trước 22:30</span><span style="color:#059669; font-weight:700;">✓ Hoàn thành</span>
+          </div>
+        `;
+      }
+    }
+
+    function setDayMood(emoji) {
+      document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('active'));
+      if (event && event.target) {
+        event.target.classList.add('active');
+      }
+      showToast(`Đã lưu tâm trạng: ${emoji}`);
+    }
+
+    /* =========================================
+       STATISTICS: 7 - 30 - 90 DAYS (FROM LOW TO HIGH)
+       WITH ANIMATED SLIDING PILL (Ô SELECT ĐEN)
+       ========================================= */
+    function switchStatsPeriod(period, tabIndex, btn) {
+      currentStatsPeriod = period;
+      
+      // Animate sliding pill
+      const pill = document.getElementById('stats-pill');
+      const parent = document.getElementById('stats-segmented-bar');
+      document.querySelectorAll('#stats-segmented-bar .segment-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      movePillToButton(pill, btn);
+      btn.blur();
+
+      renderStats();
+      showToast(`Đã tổng hợp số liệu cho ${period} Ngày`);
+    }
+
+    function renderStats() {
+      const data = STATS_DATA[currentStatsPeriod] || STATS_DATA[7];
+
+      // Update overview cards with animated countup
+      const rateEl = document.getElementById('stats-overall-rate');
+      if (rateEl) {
+        let start = 0;
+        const target = data.overallRate;
+        const step = () => {
+          start += Math.ceil((target - start) / 5) || 1;
+          if (start > target) start = target;
+          rateEl.innerText = `${start}%`;
+          if (start < target) requestAnimationFrame(step);
+        };
+        step();
+      }
+
+      document.getElementById('stats-longest-streak').innerText = data.longestStreak;
+      document.getElementById('stats-total-completed').innerText = data.totalCompleted;
+      document.getElementById('stats-best-habit').innerText = data.bestHabit;
+
+      // Update summary box static text (no scramble animation)
+      const sumTitle = document.getElementById('stats-summary-title');
+      if (sumTitle) sumTitle.innerText = data.summaryTitle;
+      const descEl = document.getElementById('stats-summary-desc');
+      if (descEl) descEl.innerText = data.summaryDesc;
+
+      // Update chart header
+      document.getElementById('chart-section-title').innerText = data.chartTitle;
+      document.getElementById('chart-avg-badge').innerText = `Avg: ${data.avgRate}`;
+
+      // Render Bar Chart with wave animation
+      const chartContainer = document.getElementById('bar-chart-bars');
+      const labelsContainer = document.getElementById('bar-chart-labels');
+      chartContainer.innerHTML = '';
+      labelsContainer.innerHTML = '';
+
+      data.bars.forEach((bar, idx) => {
+        const col = document.createElement('div');
+        col.className = 'chart-col';
+        col.innerHTML = `
+          <div class="bar-tooltip">${bar.rate}%</div>
+          <div class="chart-bar ${bar.isToday ? 'current' : ''}" style="height: 0%;"></div>
+        `;
+        chartContainer.appendChild(col);
+
+        const barEl = col.querySelector('.chart-bar');
+        setTimeout(() => {
+          if (barEl) barEl.style.height = `${bar.rate}%`;
+        }, idx * 75 + 50);
+
+        const lbl = document.createElement('div');
+        lbl.className = 'chart-label-item';
+        lbl.innerText = bar.label;
+        labelsContainer.appendChild(lbl);
+      });
+
+      // Render Habit Breakdown list with animated progress bars
+      const perfList = document.getElementById('perf-list');
+      perfList.innerHTML = data.breakdown.map((item, idx) => `
+        <div class="perf-item" style="opacity: 0; transform: translateY(8px); transition: opacity 0.3s ease, transform 0.3s ease;">
+          <div class="perf-header">
+            <span>${item.icon} ${item.name}</span>
+            <span style="color:var(--accent);">${item.text} (${item.rate}%)</span>
+          </div>
+          <div class="perf-bar-bg">
+            <div class="perf-bar-val" style="width: 0%;" data-target="${item.rate}"></div>
+          </div>
+        </div>
+      `).join('');
+
+      // Stagger breakdown items and animate width
+      setTimeout(() => {
+        const items = perfList.querySelectorAll('.perf-item');
+        items.forEach((item, i) => {
+          setTimeout(() => {
+            item.style.opacity = '1';
+            item.style.transform = 'translateY(0)';
+            const bar = item.querySelector('.perf-bar-val');
+            if (bar) bar.style.width = `${bar.getAttribute('data-target')}%`;
+          }, i * 60);
+        });
+      }, 50);
+    }
+
+    /* =========================================
+       BADGES SCREEN
+       ========================================= */
+    function renderBadges() {
+      const container = document.getElementById('badge-grid-container');
+      if (!container) return;
+      
+      container.innerHTML = badges.map((b, idx) => `
+        <div class="badge-card spotlight-card tilted-card ${b.unlocked ? 'unlocked' : 'locked'}" 
+             onclick="openBadgeDetail('${b.id}', event)" 
+             style="opacity: 0; transform: translateY(14px) scale(0.96);">
+          <div class="badge-icon-box">${b.icon}</div>
+          <div class="badge-title ${b.unlocked ? 'shiny-text' : ''}">${b.name}</div>
+          <div class="badge-desc">${b.desc}</div>
+        </div>
+      `).join('');
+
+      // Stagger animation for badges entering
+      const cards = container.querySelectorAll('.badge-card');
+      cards.forEach((c, i) => {
+        setTimeout(() => {
+          c.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          c.style.opacity = '1';
+          c.style.transform = 'translateY(0) scale(1)';
+        }, i * 45 + 30);
+      });
+
+      // Re-init spotlight and tilt effects for newly injected badge cards
+      setTimeout(() => {
+        initSpotlightCards();
+        initTiltedCards();
+      }, cards.length * 45 + 50);
+    }
+
+    function openBadgeDetail(id, e) {
+      const b = badges.find(item => item.id === id);
+      if (!b) return;
+      
+      document.getElementById('badge-detail-icon').innerText = b.icon;
+      document.getElementById('badge-detail-title').innerText = b.name;
+      document.getElementById('badge-detail-desc').innerText = b.desc;
+      
+      const statusEl = document.getElementById('badge-detail-status');
+      if (b.unlocked) {
+        statusEl.innerText = `Đã đạt được vào ngày ${b.date}`;
+        statusEl.style.background = '#ECFDF5';
+        statusEl.style.color = '#059669';
+        // Hiệu ứng pháo hoa khi mở huy hiệu đã đạt được
+        if (sparksEnabled) {
+          triggerCelebration();
+          if (e) triggerClickSpark(e.clientX, e.clientY, '#F59E0B');
+        }
+      } else {
+        statusEl.innerText = 'Chưa mở khóa · Hãy tiếp tục kiên trì';
+        statusEl.style.background = '#F3F4F6';
+        statusEl.style.color = '#6B7280';
+      }
+      
+      document.getElementById('modal-badge-detail').classList.add('show');
+    }
+
+    function closeBadgeDetail() {
+      document.getElementById('modal-badge-detail').classList.remove('show');
+    }
+
+    /* =========================================
+       MODAL: ADD NEW HABIT
+       ========================================= */
+    function setSelectedIconInPicker(icon) {
+      selectedIcon = icon;
+      document.querySelectorAll('.icon-opt').forEach(opt => {
+        opt.classList.toggle('selected', opt.textContent.trim() === icon);
+      });
+    }
+
+    function openAddHabitModal() {
+      editingHabitId = null;
+      document.getElementById('habit-modal-title').innerText = 'Tạo thói quen mới';
+      document.getElementById('btn-habit-save').innerText = 'Lưu thói quen';
+      document.getElementById('input-habit-name').value = '';
+      document.getElementById('input-habit-desc').value = '';
+      document.getElementById('input-habit-target').value = '';
+      document.getElementById('input-habit-unit').value = '';
+      setSelectedIconInPicker('💧');
+      document.getElementById('modal-add-habit').classList.add('show');
+    }
+
+    function openEditHabitModal(id, event) {
+      if (event) event.stopPropagation();
+      const h = habits.find(item => item.id === id);
+      if (!h) return;
+      editingHabitId = id;
+      document.getElementById('habit-modal-title').innerText = 'Chỉnh sửa thói quen';
+      document.getElementById('btn-habit-save').innerText = 'Lưu thay đổi';
+      document.getElementById('input-habit-name').value = h.name;
+      document.getElementById('input-habit-desc').value = h.desc || '';
+      document.getElementById('input-habit-target').value = h.type === 'quantity' ? h.target : '';
+      document.getElementById('input-habit-unit').value = h.type === 'quantity' ? (h.unit || '') : '';
+      setSelectedIconInPicker(h.icon);
+      document.getElementById('modal-add-habit').classList.add('show');
+    }
+
+    function closeAddHabitModal() {
+      document.getElementById('modal-add-habit').classList.remove('show');
+    }
+
+    function selectHabitIcon(el, icon) {
+      document.querySelectorAll('.icon-opt').forEach(opt => opt.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedIcon = icon;
+    }
+
+    function saveHabit() {
+      const name = document.getElementById('input-habit-name').value.trim();
+      const desc = document.getElementById('input-habit-desc').value.trim() || 'Thói quen hằng ngày';
+      const targetRaw = document.getElementById('input-habit-target').value.trim();
+      const unit = document.getElementById('input-habit-unit').value.trim();
+
+      if (!name) {
+        alert('Vui lòng nhập tên thói quen!');
+        return;
+      }
+
+      // Để trống số lượng => thói quen đơn giản (tick là xong)
+      let target = null;
+      if (targetRaw !== '') {
+        target = Number(targetRaw);
+        if (!Number.isInteger(target) || target < 1 || target > 999) {
+          alert('Số lượng mục tiêu phải là số nguyên từ 1 đến 999, hoặc để trống.');
+          return;
+        }
+      }
+
+      if (editingHabitId) {
+        const h = habits.find(item => item.id === editingHabitId);
+        if (!h) { closeAddHabitModal(); return; }
+
+        const wasQuantity = h.type === 'quantity';
+        h.name = name;
+        h.desc = desc;
+        h.icon = selectedIcon;
+
+        if (target !== null) {
+          // Tạo mới hoặc chỉnh mục tiêu số lượng
+          if (!wasQuantity) {
+            h.current = h.completed ? target : 0;
+          }
+          h.type = 'quantity';
+          h.target = target;
+          h.unit = unit;
+          h.current = Math.max(0, Math.min(h.current || 0, target));
+          h.completed = h.current >= h.target;
+        } else if (wasQuantity) {
+          // Chuyển về thói quen đơn giản, giữ nguyên trạng thái hoàn thành
+          h.type = 'simple';
+          delete h.current;
+          delete h.target;
+          delete h.unit;
+        }
+
+        persistState();
+        renderHabits();
+        updateHeroProgress();
+        renderStats();
+        renderCalendar();
+        closeAddHabitModal();
+        showToast(`Đã cập nhật "${name}" ✏️`);
+        editingHabitId = null;
+        return;
+      }
+
+      const newHabit = {
+        id: 'habit-' + Date.now(),
+        name: name,
+        desc: desc,
+        icon: selectedIcon,
+        streak: 1,
+        completed: false,
+        type: target !== null ? 'quantity' : 'simple'
+      };
+      if (target !== null) {
+        newHabit.current = 0;
+        newHabit.target = target;
+        newHabit.unit = unit;
+      }
+
+      habits.push(newHabit);
+      persistState();
+      renderHabits();
+      updateHeroProgress();
+      renderCalendar();
+      closeAddHabitModal();
+      showToast(`Đã thêm "${name}" thành công! 🌱`);
+    }
+
+    /* =========================================
+       BOTTOM NAVIGATION TABS
+       ========================================= */
+    function switchTab(tabId) {
+      document.querySelectorAll('.screen-view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      
+      const view = document.getElementById(`view-${tabId}`);
+      const nav = document.getElementById(`tab-${tabId}`);
+      
+      if (view) view.classList.add('active');
+      if (nav) nav.classList.add('active');
+      
+      if (tabId === 'calendar') renderCalendar();
+      if (tabId === 'stats') renderStats();
+      if (tabId === 'badges') renderBadges();
+      if (tabId === 'calendar' || tabId === 'stats') requestAnimationFrame(syncSegmentedPills);
+      
+      document.querySelector('.app-screen-viewport').scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Reset and trigger shiny text sweep animation for 2.8s
+      document.querySelectorAll('.shiny-text').forEach(el => {
+        el.style.animation = 'none';
+        void el.offsetWidth; // trigger reflow
+        el.style.animation = 'shinyTextSweep 2.8s cubic-bezier(0.2, 0, 0, 1) 1 forwards';
+      });
+
+      // Run screen enter animations & re-initialize effects on tab switch
+      if (view) {
+        requestAnimationFrame(() => {
+          animateScreenEnter(view);
+          initSpotlightCards();
+          initTiltedCards();
+          if (tabId === 'calendar') setTimeout(() => initCalendarTooltip(), 100);
+          if (tabId === 'today') {
+            const heading = view.querySelector('.screen-heading');
+            if (heading) typewriterEffect(heading, "Today's Habits", 100);
+          }
+        });
+      }
+    }
+
+    /* =========================================
+       THEME & SETTINGS
+       ========================================= */
+    function toggleDarkMode(isDark) {
+      if (isDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.getElementById('dark-icon').innerText = '☀️';
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        document.getElementById('dark-icon').innerText = '🌙';
+      }
+      localStorage.setItem('ht_theme', isDark ? 'dark' : 'light');
+    }
+
+    function setAppAccent(accentName, circleEl) {
+      document.body.className = `accent-${accentName}`;
+      document.querySelectorAll('.palette-circle').forEach(c => c.classList.remove('active'));
+      if (circleEl) circleEl.classList.add('active');
+      localStorage.setItem('ht_accent', accentName);
+      showToast(`Đã đổi màu chủ đạo: ${accentName}`);
+    }
+
+    function toggleSound(enabled) {
+      soundEnabled = enabled;
+      persistState();
+      showToast(enabled ? 'Đã bật hiệu ứng âm thanh' : 'Đã tắt âm thanh');
+    }
+
+    function confirmResetData() {
+      if (confirm('Bạn có chắc chắn muốn đặt lại dữ liệu về ban đầu?')) {
+        localStorage.clear();
+        habits = [...DEFAULT_HABITS];
+        badges = [...DEFAULT_BADGES];
+        totalXP = 1250;
+        currentCalMonth = TODAY_MONTH;
+        currentCalYear = TODAY_YEAR;
+        selectedDay = TODAY_DAY;
+        persistState();
+        renderHabits();
+        updateHeroProgress();
+        renderCalendar();
+        renderStats();
+        renderBadges();
+        showToast('Dữ liệu đã được nạp lại mặc định');
+      }
+    }
+
+    // Desktop background switcher (Clean empty backdrops)
+    let bgState = 0;
+    document.getElementById('btn-toggle-bg').onclick = () => {
+      bgState = (bgState + 1) % 3;
+      if (bgState === 0) {
+        document.body.style.backgroundColor = '#EBF1ED';
+      } else if (bgState === 1) {
+        document.body.style.backgroundColor = '#FFFFFF';
+      } else {
+        document.body.style.backgroundColor = '#161F1A';
+      }
+    };
+
+    document.getElementById('btn-desktop-dark').onclick = () => {
+      const isCurrentlyDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      toggleDarkMode(!isCurrentlyDark);
+      const switchEl = document.getElementById('switch-dark-mode');
+      if (switchEl) switchEl.checked = !isCurrentlyDark;
+    };
+
+    document.getElementById('btn-reset-sample').onclick = confirmResetData;
+
+    // =====================================================================
+    // REACT-BITS INSPIRED ANIMATION ENGINE
+    // =====================================================================
+
+    let sparksEnabled = true;
+    const sparksBtn = document.getElementById('btn-toggle-sparks');
+    if (sparksBtn) sparksBtn.onclick = () => {
+      sparksEnabled = !sparksEnabled;
+      sparksBtn.innerHTML = sparksEnabled
+        ? '<span>✨</span> Hiệu ứng: Bật'
+        : '<span>⚫</span> Hiệu ứng: Tắt';
+    };
+
+    /* ----- 1. REACT BITS: AURORA MESH - đã có ở CSS, animated tự chạy ----- */
+
+    /* ----- 2. REACT BITS: SPOTLIGHT CARD – Light follows mouse ----- */
+    function initSpotlightCards() {
+      document.querySelectorAll('.spotlight-card').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          card.style.setProperty('--spotlight-x', `${x}px`);
+          card.style.setProperty('--spotlight-y', `${y}px`);
+        });
+      });
+    }
+
+    /* ----- 3. REACT BITS: TILTED CARD – Subtle 3D tilt on hover ----- */
+    function initTiltedCards() {
+      document.querySelectorAll('.tilted-card').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          if (!sparksEnabled) return;
+          const rect = card.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          const dx = (e.clientX - cx) / (rect.width / 2);
+          const dy = (e.clientY - cy) / (rect.height / 2);
+          const tiltX = dy * -6;
+          const tiltY = dx * 6;
+          card.style.transform = `perspective(600px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.025)`;
+        });
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = '';
+        });
+      });
+    }
+
+    /* ----- 4. REACT BITS: CLICK SPARK – Burst of sparks on click ----- */
+    const sparkCanvas = document.getElementById('click-spark-canvas');
+    const sparkCtx = sparkCanvas ? sparkCanvas.getContext('2d') : null;
+    let sparkParticles = [];
+
+    function resizeSparkCanvas() {
+      if (!sparkCanvas) return;
+      const phone = document.getElementById('phone-device');
+      if (phone) {
+        sparkCanvas.width = phone.clientWidth;
+        sparkCanvas.height = phone.clientHeight;
+      }
+    }
+
+    function triggerClickSpark(clientX, clientY, color = '#6EE7B7') {
+      if (!sparksEnabled || !sparkCanvas) return;
+      const phone = document.getElementById('phone-device');
+      if (!phone) return;
+      const phoneRect = phone.getBoundingClientRect();
+      const x = clientX - phoneRect.left;
+      const y = clientY - phoneRect.top;
+      const count = 14;
+      for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 / count) * i;
+        const speed = 2.5 + Math.random() * 3.5;
+        sparkParticles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          alpha: 1,
+          size: 3 + Math.random() * 3,
+          color: Math.random() > 0.5 ? color : '#FFFFFF',
+          life: 1
+        });
+      }
+      if (!sparkLoopRunning) {
+        sparkLoopRunning = true;
+        requestAnimationFrame(animateSparks);
+      }
+    }
+
+    let sparkLoopRunning = false;
+    function animateSparks() {
+      if (!sparkCtx || !sparkCanvas) { sparkLoopRunning = false; return; }
+      sparkCtx.clearRect(0, 0, sparkCanvas.width, sparkCanvas.height);
+      sparkParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.18;
+        p.vx *= 0.94;
+        p.life -= 0.045;
+        if (p.life <= 0) return; // hết đời thì không vẽ (tránh bán kính âm)
+        p.alpha = p.life;
+        sparkCtx.save();
+        sparkCtx.globalAlpha = p.alpha;
+        sparkCtx.fillStyle = p.color;
+        sparkCtx.beginPath();
+        sparkCtx.arc(p.x, p.y, Math.max(0.1, p.size * p.life), 0, Math.PI * 2);
+        sparkCtx.fill();
+        sparkCtx.restore();
+      });
+      sparkParticles = sparkParticles.filter(p => p.life > 0);
+      if (sparkParticles.length > 0) {
+        requestAnimationFrame(animateSparks);
+      } else {
+        sparkLoopRunning = false;
+      }
+    }
+
+    // Hook clicks inside phone to spark
+    document.getElementById('phone-device')?.addEventListener('click', (e) => {
+      const target = e.target;
+      const isInteractable = target.closest('button') || target.closest('.cal-day') || target.closest('.habit-card');
+      if (isInteractable && sparksEnabled) {
+        const col = target.closest('.habit-card.completed') ? '#6EE7B7'
+                  : target.closest('.cal-day') ? '#A8D5BA'
+                  : '#34765A';
+        triggerClickSpark(e.clientX, e.clientY, col);
+      }
+    });
+
+    /* ----- 5. REACT BITS: FLOAT XP BUBBLE – +25 XP floats up on complete ----- */
+    function spawnFloatXP(sourceEl, label) {
+      if (!sparksEnabled) return;
+      const container = document.getElementById('floating-xp-container');
+      if (!container) return;
+      const phone = document.getElementById('phone-device');
+      const phoneRect = phone.getBoundingClientRect();
+      let x, y;
+      if (sourceEl) {
+        const rect = sourceEl.getBoundingClientRect();
+        x = rect.left + rect.width / 2 - phoneRect.left;
+        y = rect.top - phoneRect.top;
+      } else {
+        x = phoneRect.width / 2;
+        y = phoneRect.height / 2;
+      }
+      const bubble = document.createElement('div');
+      bubble.className = 'xp-float-bubble';
+      bubble.style.left = x + 'px';
+      bubble.style.top = y + 'px';
+      bubble.textContent = label;
+      container.appendChild(bubble);
+      setTimeout(() => bubble.remove(), 1300);
+    }
+
+    /* ----- 6. REACT BITS: SCREEN ENTER ANIMATION – stagger children on tab switch ----- */
+    function animateScreenEnter(sectionEl) {
+      if (!sparksEnabled) return;
+      const cards = sectionEl.querySelectorAll('.stat-card, .habit-card, .calendar-card, .day-detail-card, .summary-grid, .feature-card, .chart-card, .stats-summary-box, .level-hero-card, .badge-card');
+      cards.forEach((card, i) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(16px)';
+        card.style.transition = 'none';
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            card.style.transition = 'opacity 0.38s ease, transform 0.38s cubic-bezier(0.16,1,0.3,1)';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+          }, i * 45);
+        });
+      });
+    }
+
+    /* ----- 7. REACT BITS: HEATMAP TOOLTIP – show info on hover ----- */
+    function initCalendarTooltip() {
+      const grid = document.getElementById('cal-grid');
+      const tooltip = document.getElementById('cal-cell-tooltip');
+      if (!grid || !tooltip) return;
+
+      grid.addEventListener('mousemove', (e) => {
+        const cell = e.target.closest('.cal-day:not(.empty)');
+        if (!cell) {
+          tooltip.style.display = 'none';
+          return;
+        }
+        const day = parseInt(cell.getAttribute('data-day'), 10);
+        if (!day) return;
+        const level = [...cell.classList].find(c => c.startsWith('level-'))?.replace('level-', '') || '0';
+        const labels = ['Chưa làm', 'Ít thói quen', 'Vừa phải', 'Khá nhiều', 'Hoàn hảo 🎉'];
+        const phone = document.getElementById('phone-device');
+        const phoneRect = phone.getBoundingClientRect();
+        const cellRect = cell.getBoundingClientRect();
+        const x = cellRect.left + cellRect.width / 2 - phoneRect.left;
+        const y = cellRect.top - phoneRect.top;
+        const months = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+                        'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+        const isToday = currentCalYear === TODAY_YEAR && currentCalMonth === TODAY_MONTH && day === TODAY_DAY;
+        tooltip.textContent = `${isToday ? '📍 Hôm nay · ' : ''}${day} ${months[currentCalMonth]} · ${labels[+level]}`;
+        tooltip.style.left = x + 'px';
+        tooltip.style.top = y + 'px';
+        tooltip.style.display = 'block';
+        tooltip.style.opacity = '1';
+        tooltip.style.transform = `translate(-50%, -130%)`;
+      });
+
+      grid.addEventListener('mouseleave', () => {
+        tooltip.style.opacity = '0';
+        setTimeout(() => { tooltip.style.display = 'none'; }, 150);
+      });
+    }
+
+    /* ----- 8. REACT BITS: SHINY TEXT - heading scramble on page load ----- */
+    function typewriterEffect(el, text, delay = 0) {
+      if (!el || !sparksEnabled) return;
+      const original = el.textContent;
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let frame = 0;
+      const totalFrames = text.length * 3;
+      setTimeout(() => {
+        const interval = setInterval(() => {
+          el.textContent = text.split('').map((ch, i) => {
+            if (i < Math.floor(frame / 3)) return ch;
+            return ch === ' ' ? ' ' : chars[Math.floor(Math.random() * chars.length)];
+          }).join('');
+          frame++;
+          if (frame > totalFrames) {
+            clearInterval(interval);
+            el.textContent = text;
+          }
+        }, 30);
+      }, delay);
+    }
+
+    /* ----- 9. REACT BITS: SCROLL FLOAT – fade-in stagger on entering viewport ----- */
+    function initScrollFloat() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+
+      document.querySelectorAll('.stat-card, .feature-card, .calendar-card').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(24px)';
+        el.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1)';
+        observer.observe(el);
+      });
+    }
+
+    /* ----- INIT ALL REACT-BITS EFFECTS ----- */
+    window.addEventListener('DOMContentLoaded', () => {
+      resizeSparkCanvas();
+      window.addEventListener('resize', resizeSparkCanvas);
+      initSpotlightCards();
+      initTiltedCards();
+      initScrollFloat();
+      setTimeout(() => initCalendarTooltip(), 400);
+
+      // Scramble screen heading on first load
+      const heading = document.querySelector('#view-today .screen-heading');
+      if (heading) typewriterEffect(heading, "Today's Habits", 500);
+    });
+
+    // Live Clock Update
+    function updateLiveClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      const clockEl = document.getElementById('live-clock');
+      if (clockEl) clockEl.innerText = `${hours}:${mins}`;
+      
+      const greetingEl = document.getElementById('greeting-text');
+      if (greetingEl) {
+        const h = now.getHours();
+        if (h < 12) greetingEl.innerText = "Good morning, Tân!";
+        else if (h < 18) greetingEl.innerText = "Good afternoon, Tân!";
+        else greetingEl.innerText = "Good evening, Tân!";
+      }
+    }
+
+    // Init on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      updateLiveClock();
+      setInterval(updateLiveClock, 30000);
+      
+      const savedTheme = localStorage.getItem('ht_theme');
+      if (savedTheme === 'dark') {
+        toggleDarkMode(true);
+        const switchEl = document.getElementById('switch-dark-mode');
+        if (switchEl) switchEl.checked = true;
+      }
+      
+      const savedAccent = localStorage.getItem('ht_accent');
+      if (savedAccent) {
+        document.body.className = `accent-${savedAccent}`;
+      }
+      
+      // Mặc định khi mở lên là lịch chọn ngay ngày hôm nay
+      currentCalMonth = TODAY_MONTH;
+      currentCalYear = TODAY_YEAR;
+      selectedDay = TODAY_DAY;
+
+      renderHabits();
+      updateHeroProgress();
+      renderCalendar();
+      renderStats();
+      renderBadges();
+    });
+  </script>
+
+  <!-- SPLASH / INTRO LOGIC -->
+  <script>
+  (function () {
+    // áp dụng theme đã lưu sớm để splash không bị nháy sáng/tối
+    try { if (localStorage.getItem('ht_theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark'); } catch (e) {}
+
+    var splash = document.getElementById('ht-splash'),
+        logo = document.getElementById('ht-splash-logo'),
+        title = document.getElementById('ht-splash-title'),
+        timer, hideTimer;
+    if (!splash) return;
+
+    // tách chữ để từng chữ nảy lên
+    title.innerHTML = Array.from('Habit Tracker').map(function (ch, n) {
+      return '<span aria-hidden="true" style="--n:' + n + '">' + (ch === ' ' ? '&nbsp;' : ch) + '</span>';
+    }).join('');
+
+    // hạt lá bắn ra quanh logo
+    for (var k = 0; k < 12; k++) {
+      var p = document.createElement('i');
+      p.style.setProperty('--a', (k * 30 + (k % 2 ? 10 : 0)) + 'deg');
+      p.style.setProperty('--d', (78 + (k % 3) * 18) + 'px');
+      p.style.animationDelay = (1.5 + (k % 4) * .04) + 's';
+      logo.appendChild(p);
+    }
+
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function reveal() {
+      if (splash.classList.contains('leave') || splash.hidden) return;
+      clearTimeout(timer);
+      splash.classList.add('leave');
+      // cho app "vào" mượt khi splash tan đi
+      var view = document.getElementById('view-today');
+      if (view && view.classList.contains('active')) {
+        if (typeof animateScreenEnter === 'function') animateScreenEnter(view);
+        var heading = view.querySelector('.screen-heading');
+        if (heading && typeof typewriterEffect === 'function') typewriterEffect(heading, "Today's Habits", 150);
+      }
+      hideTimer = setTimeout(function () { splash.hidden = true; }, 700);
+    }
+
+    function play() {
+      clearTimeout(timer); clearTimeout(hideTimer);
+      splash.hidden = false;
+      splash.classList.remove('play', 'leave');
+      void splash.offsetWidth;
+      splash.classList.add('play');
+      timer = setTimeout(reveal, reduce ? 900 : 4100);
+    }
+
+    splash.addEventListener('click', reveal);          // chạm để bỏ qua
+    var replay = document.getElementById('btn-replay-splash');
+    if (replay) replay.addEventListener('click', play); // nút xem lại (desktop)
+    play();
+  })();
+  </script>
+</body>
+</html>
